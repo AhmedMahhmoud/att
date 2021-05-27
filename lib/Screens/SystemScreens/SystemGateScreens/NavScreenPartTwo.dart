@@ -62,10 +62,10 @@ class _NavScreenTwoState extends State<NavScreenTwo> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {var userData=Provider.of<UserData>(context);
     final userDataProvider = Provider.of<UserData>(context, listen: false);
     var connectionStatus = Provider.of<ConnectivityStatus>(context);
-    return connectionStatus == ConnectivityStatus.Offline
+    return connectionStatus == ConnectivityStatus.Offline && userData.cachedUserData.isNotEmpty
         ? ErrorScreen2(
             child: Container(),
           )

@@ -17,74 +17,77 @@ class ErrorScreen2 extends StatelessWidget {
     var connectionStatus = Provider.of<ConnectivityStatus>(context);
     if (connectionStatus == ConnectivityStatus.Wifi ||
         connectionStatus == ConnectivityStatus.Cellular) {
-      print("wifi");
+      print(connectionStatus);
       return child;
     }
     var userData = Provider.of<UserData>(context);
-    return Scaffold(
-      drawer: DrawerI(),
-      body: Column(
-        children: [
-          NewHeader(userData.cachedUserData),
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    child: Lottie.asset(
-                        "resources/21485-wifi-outline-icon.json",
-                        repeat: false),
-                    height: 200.h,
-                    width: 200.w,
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  Column(
-                    children: [
-                      Container(
-                        height: 20,
-                        child: AutoSizeText(
-                          "لا يوجد اتصال بالأنترنت",
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: ScreenUtil()
-                                .setSp(18, allowFontScalingSelf: true),
+    return GestureDetector(
+      onTap: ()=>print( userData.cachedUserData.isNotEmpty),
+      child: Scaffold(
+        drawer: DrawerI(),
+        body: Column(
+          children: [
+  NewHeader(userData.cachedUserData),
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      child: Lottie.asset(
+                          "resources/21485-wifi-outline-icon.json",
+                          repeat: false),
+                      height: 200.h,
+                      width: 200.w,
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Column(
+                      children: [
+                        Container(
+                          height: 20,
+                          child: AutoSizeText(
+                            "لا يوجد اتصال بالأنترنت",
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: ScreenUtil()
+                                  .setSp(18, allowFontScalingSelf: true),
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Container(
-                        height: 20,
-                        child: AutoSizeText(
-                          "برجاء المحاولة مرة اخرى ",
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: ScreenUtil()
-                                .setSp(14, allowFontScalingSelf: true),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 20,
+                          child: AutoSizeText(
+                            "برجاء المحاولة مرة اخرى ",
+                            maxLines: 1,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: ScreenUtil()
+                                  .setSp(14, allowFontScalingSelf: true),
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      SizedBox(
-                        height: 40.h,
-                      ),
-                      userData.isLoading
-                          ? CircularProgressIndicator()
-                          : Container()
-                    ],
-                  ),
-                ],
+                        SizedBox(
+                          height: 40.h,
+                        ),
+                        userData.isLoading
+                            ? CircularProgressIndicator()
+                            : Container()
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

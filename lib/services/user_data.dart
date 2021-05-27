@@ -41,7 +41,10 @@ class UserData with ChangeNotifier {
     id: "",
   );
   List<String> cachedUserData = [];
-
+setCacheduserData(List<String>cached){
+cachedUserData=cached;
+notifyListeners();
+}
   final _apiToken = 'ByYM000OLlMQG6VVVp1OH7Xzyr7gHuw1qvUC5dcGt3SNM';
   bool loggedIn = false;
   Future<bool> isConnectedToInternet() async {

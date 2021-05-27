@@ -66,15 +66,16 @@ class _SplashScreenState extends State<SplashScreen>
     } else {
       print('not null');
       print(cachedUserData[4]);
-      Provider.of<UserData>(context, listen: false).cachedUserData =
-          cachedUserData;
+    Provider.of<UserData>(context, listen: false).setCacheduserData(cachedUserData);
+
+    
     }
   }
 
   AnimationController animationController;
   reverse(String userName, value) {
     //Reverse animation Function
-
+var userData=Provider.of<UserData>(context,listen: false);
     setState(() {
       animationController.reverse();
       Timer(new Duration(milliseconds: 2000), () async {
@@ -94,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) {
-                return ErrorScreen2(child: NavScreenTwo(0));
+                return            userData.cachedUserData.isNotEmpty?  ErrorScreen2(child: NavScreenTwo(0)):NavScreenTwo(0);
                 // return ShowCaseWidget(
                 //   onStart: (index, key) {
                 //     log('onStart: $index, $key');
@@ -124,7 +125,7 @@ class _SplashScreenState extends State<SplashScreen>
                   context,
                   MaterialPageRoute(
                     builder: (context) =>
-                        Container(child: ErrorScreen2(child: HomePage())),
+                        Container(child:        userData.cachedUserData.isNotEmpty?  ErrorScreen2(child: HomePage()):HomePage()),
                   ));
               getUserData();
             } else if (value == -1) {
