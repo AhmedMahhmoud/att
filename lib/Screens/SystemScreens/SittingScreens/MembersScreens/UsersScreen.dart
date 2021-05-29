@@ -26,6 +26,7 @@ import 'package:qr_users/widgets/headers.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart'
     as intlPhone;
+import 'package:shimmer/shimmer.dart';
 
 class RoundedSearchBar extends StatelessWidget {
   final Function searchFun;
@@ -517,8 +518,9 @@ class _UsersScreenState extends State<UsersScreen> {
                                     ),
                                   );
                                 }
+
                                 return FutureBuilder(
-                                    future: Provider.of<SiteData>(context)
+                                    future: Provider.of<MemberData>(context)
                                         .futureListener,
                                     builder: (context, snapshot) {
                                       if (!snapshot.hasData) {
@@ -540,293 +542,253 @@ class _UsersScreenState extends State<UsersScreen> {
                                           ),
                                         );
                                       }
-                                      return FutureBuilder(
-                                          future:
-                                              Provider.of<MemberData>(context)
-                                                  .futureListener,
-                                          builder: (context, snapshot) {
-                                            if (!snapshot.hasData) {
-                                              return Container(
-                                                color: Colors.white,
-                                                child: Center(
-                                                  child: Platform.isIOS
-                                                      ? CupertinoActivityIndicator(
-                                                          radius: 20,
-                                                        )
-                                                      : CircularProgressIndicator(
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          valueColor:
-                                                              new AlwaysStoppedAnimation<
-                                                                      Color>(
-                                                                  Colors
-                                                                      .orange),
-                                                        ),
-                                                ),
-                                              );
-                                            }
-                                            switch (snapshot.connectionState) {
-                                              case ConnectionState.waiting:
-                                                return Container(
-                                                  color: Colors.white,
-                                                  child: Center(
-                                                    child: Platform.isIOS
-                                                        ? CupertinoActivityIndicator(
-                                                            radius: 20,
-                                                          )
-                                                        : CircularProgressIndicator(
-                                                            backgroundColor:
-                                                                Colors.white,
-                                                            valueColor:
-                                                                new AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                    Colors
-                                                                        .orange),
-                                                          ),
-                                                  ),
-                                                );
-                                              case ConnectionState.done:
-                                                return Column(
-                                                  children: [
-                                                    Container(
-                                                      height: 110.h,
-                                                      width: 330.w,
-                                                      child: RoundedSearchBar(
-                                                        list: Provider.of<
-                                                                    SiteData>(
-                                                                context,
-                                                                listen: true)
-                                                            .dropDownSitesList,
-                                                        dropdownValue: widget
-                                                            .selectedValue,
-                                                        searchFun: (value) {
-                                                          print(value);
-                                                          searchInList(value);
-                                                        },
-                                                        textController:
-                                                            _nameController,
-                                                        dropdownFun: (value) {
-                                                          setState(() {
-                                                            widget.selectedValue =
-                                                                value;
-                                                            print(
-                                                                "current : ${widget.selectedValue}");
-                                                          });
+                                      switch (snapshot.connectionState) {
+                                        case ConnectionState.waiting:
+                                          return Container(
+                                              child: buildShimmer(10));
+                                        case ConnectionState.done:
+                                          return Column(
+                                            children: [
+                                              Container(
+                                                height: 110.h,
+                                                width: 330.w,
+                                                child: RoundedSearchBar(
+                                                  list: Provider.of<SiteData>(
+                                                          context,
+                                                          listen: true)
+                                                      .dropDownSitesList,
+                                                  dropdownValue:
+                                                      widget.selectedValue,
+                                                  searchFun: (value) {
+                                                    print(value);
+                                                    searchInList(value);
+                                                  },
+                                                  textController:
+                                                      _nameController,
+                                                  dropdownFun: (value) {
+                                                    setState(() {
+                                                      widget.selectedValue =
+                                                          value;
+                                                      print(
+                                                          "current : ${widget.selectedValue}");
+                                                    });
 
-                                                          var userProvider =
-                                                              Provider.of<
-                                                                      UserData>(
-                                                                  context,
-                                                                  listen:
-                                                                      false);
-                                                          var id = getsiteIndex(
-                                                              value);
-                                                          if (id != siteIndex) {
-                                                            siteIndex = id;
-                                                            Provider.of<MemberData>(context, listen: false).getAllCompanyMember(
-                                                                Provider.of<SiteData>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .dropDownSitesList[
-                                                                        siteIndex]
-                                                                    .id,
-                                                                Provider.of<CompanyData>(
-                                                                        context,
-                                                                        listen:
-                                                                            false)
-                                                                    .com
-                                                                    .id,
-                                                                userProvider
-                                                                    .user
-                                                                    .userToken);
-                                                            setState(() {
-                                                              widget
-                                                                  .selectedValue = Provider.of<
-                                                                          SiteData>(
+                                                    var userProvider =
+                                                        Provider.of<UserData>(
+                                                            context,
+                                                            listen: false);
+                                                    var id =
+                                                        getsiteIndex(value);
+                                                    if (id != siteIndex) {
+                                                      siteIndex = id;
+                                                      Provider.of<MemberData>(
+                                                              context,
+                                                              listen: false)
+                                                          .getAllCompanyMember(
+                                                              Provider.of<SiteData>(
                                                                       context,
                                                                       listen:
                                                                           false)
                                                                   .dropDownSitesList[
                                                                       siteIndex]
-                                                                  .name;
-                                                            });
-                                                            print(value);
-                                                          }
+                                                                  .id,
+                                                              Provider.of<CompanyData>(
+                                                                      context,
+                                                                      listen:
+                                                                          false)
+                                                                  .com
+                                                                  .id,
+                                                              userProvider.user
+                                                                  .userToken);
+                                                      setState(() {
+                                                        widget.selectedValue =
+                                                            Provider.of<SiteData>(
+                                                                    context,
+                                                                    listen:
+                                                                        false)
+                                                                .dropDownSitesList[
+                                                                    siteIndex]
+                                                                .name;
+                                                      });
+                                                      print(value);
+                                                    }
 
-                                                          print(value);
-                                                        },
-                                                      ),
-                                                    ),
-                                                    Expanded(
-                                                        child: memberData
-                                                                    .membersList
-                                                                    .length !=
-                                                                0
-                                                            ? Container(
-                                                                child:
-                                                                    SmartRefresher(
-                                                                  onRefresh:
-                                                                      _onRefresh,
-                                                                  controller:
-                                                                      refreshController,
-                                                                  enablePullDown:
-                                                                      true,
-                                                                  header:
-                                                                      WaterDropMaterialHeader(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .orange,
-                                                                  ),
-                                                                  child: ListView
-                                                                      .builder(
-                                                                          itemCount: memberData
-                                                                              .membersListScreenDropDownSearch
-                                                                              .length,
-                                                                          itemBuilder:
-                                                                              (BuildContext context, int index) {
-                                                                            return MemberTile(
-                                                                              user: memberData.membersListScreenDropDownSearch[index],
-                                                                              onTapDelete: () {
-                                                                                return showDialog(
-                                                                                    context: context,
-                                                                                    builder: (BuildContext context) {
-                                                                                      return RoundedAlert(
-                                                                                          onPressed: () async {
-                                                                                            showDialog(
-                                                                                                context: context,
-                                                                                                builder: (BuildContext context) {
-                                                                                                  return RoundedLoadingIndicator();
-                                                                                                });
-                                                                                            var token = Provider.of<UserData>(context, listen: false).user.userToken;
-                                                                                            if (await memberData.deleteMember(memberData.membersListScreenDropDownSearch[index].id, index, token) == "Success") {
-                                                                                              Navigator.pop(context);
-                                                                                              Fluttertoast.showToast(
-                                                                                                msg: "تم الحذف بنجاح",
-                                                                                                gravity: ToastGravity.CENTER,
-                                                                                                toastLength: Toast.LENGTH_SHORT,
-                                                                                                timeInSecForIosWeb: 1,
-                                                                                                backgroundColor: Colors.green,
-                                                                                                textColor: Colors.white,
-                                                                                                fontSize: 16.0,
-                                                                                              );
-                                                                                            } else {
-                                                                                              Fluttertoast.showToast(
-                                                                                                msg: "خطأ في الحذف",
-                                                                                                gravity: ToastGravity.CENTER,
-                                                                                                toastLength: Toast.LENGTH_SHORT,
-                                                                                                timeInSecForIosWeb: 1,
-                                                                                                backgroundColor: Colors.red,
-                                                                                                textColor: Colors.black,
-                                                                                                fontSize: 16.0,
-                                                                                              );
-                                                                                            }
+                                                    print(value);
+                                                  },
+                                                ),
+                                              ),
+                                              Expanded(
+                                                  child:
+                                                      memberData.membersList
+                                                                  .length !=
+                                                              0
+                                                          ? Container(
+                                                              child:
+                                                                  SmartRefresher(
+                                                                onRefresh:
+                                                                    _onRefresh,
+                                                                controller:
+                                                                    refreshController,
+                                                                enablePullDown:
+                                                                    true,
+                                                                header:
+                                                                    WaterDropMaterialHeader(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .orange,
+                                                                ),
+                                                                child: ListView
+                                                                    .builder(
+                                                                        itemCount: memberData
+                                                                            .membersListScreenDropDownSearch
+                                                                            .length,
+                                                                        itemBuilder:
+                                                                            (BuildContext context,
+                                                                                int index) {
+                                                                          return MemberTile(
+                                                                            user:
+                                                                                memberData.membersListScreenDropDownSearch[index],
+                                                                            onTapDelete:
+                                                                                () {
+                                                                              return showDialog(
+                                                                                  context: context,
+                                                                                  builder: (BuildContext context) {
+                                                                                    return RoundedAlert(
+                                                                                        onPressed: () async {
+                                                                                          showDialog(
+                                                                                              context: context,
+                                                                                              builder: (BuildContext context) {
+                                                                                                return RoundedLoadingIndicator();
+                                                                                              });
+                                                                                          var token = Provider.of<UserData>(context, listen: false).user.userToken;
+                                                                                          if (await memberData.deleteMember(memberData.membersListScreenDropDownSearch[index].id, index, token) == "Success") {
                                                                                             Navigator.pop(context);
-                                                                                            Navigator.pop(context);
-                                                                                          },
-                                                                                          title: 'إزالة مستخدم',
-                                                                                          content: "هل تريد إزالة${memberData.membersListScreenDropDownSearch[index].name} ؟");
-                                                                                    });
-                                                                              },
-                                                                              onTapEdit: () async {
-                                                                                print(index);
-                                                                                print(memberData.membersListScreenDropDownSearch[index].shiftId);
-                                                                                print(memberData.membersListScreenDropDownSearch[index].id);
-                                                                                print(memberData.membersListScreenDropDownSearch[index].phoneNumber);
-                                                                                var phone = await getPhoneInEdit(memberData.membersListScreenDropDownSearch[index].phoneNumber[0] != "+" ? "+${memberData.membersListScreenDropDownSearch[index].phoneNumber}" : memberData.membersListScreenDropDownSearch[index].phoneNumber);
+                                                                                            Fluttertoast.showToast(
+                                                                                              msg: "تم الحذف بنجاح",
+                                                                                              gravity: ToastGravity.CENTER,
+                                                                                              toastLength: Toast.LENGTH_SHORT,
+                                                                                              timeInSecForIosWeb: 1,
+                                                                                              backgroundColor: Colors.green,
+                                                                                              textColor: Colors.white,
+                                                                                              fontSize: 16.0,
+                                                                                            );
+                                                                                          } else {
+                                                                                            Fluttertoast.showToast(
+                                                                                              msg: "خطأ في الحذف",
+                                                                                              gravity: ToastGravity.CENTER,
+                                                                                              toastLength: Toast.LENGTH_SHORT,
+                                                                                              timeInSecForIosWeb: 1,
+                                                                                              backgroundColor: Colors.red,
+                                                                                              textColor: Colors.black,
+                                                                                              fontSize: 16.0,
+                                                                                            );
+                                                                                          }
+                                                                                          Navigator.pop(context);
+                                                                                          Navigator.pop(context);
+                                                                                        },
+                                                                                        title: 'إزالة مستخدم',
+                                                                                        content: "هل تريد إزالة${memberData.membersListScreenDropDownSearch[index].name} ؟");
+                                                                                  });
+                                                                            },
+                                                                            onTapEdit:
+                                                                                () async {
+                                                                              print(index);
+                                                                              print(memberData.membersListScreenDropDownSearch[index].shiftId);
+                                                                              print(memberData.membersListScreenDropDownSearch[index].id);
+                                                                              print(memberData.membersListScreenDropDownSearch[index].phoneNumber);
+                                                                              var phone = await getPhoneInEdit(memberData.membersListScreenDropDownSearch[index].phoneNumber[0] != "+" ? "+${memberData.membersListScreenDropDownSearch[index].phoneNumber}" : memberData.membersListScreenDropDownSearch[index].phoneNumber);
 
-                                                                                Navigator.of(context).push(
-                                                                                  new MaterialPageRoute(
-                                                                                    builder: (context) => AddUserScreen(memberData.membersListScreenDropDownSearch[index], index, true, phone[0], phone[1]),
-                                                                                  ),
-                                                                                );
-                                                                              },
-                                                                              onResetMac: () {
-                                                                                return showDialog(
-                                                                                    context: context,
-                                                                                    builder: (BuildContext context) {
-                                                                                      return RoundedAlert(
-                                                                                          onPressed: () async {
-                                                                                            showDialog(
-                                                                                                context: context,
-                                                                                                builder: (BuildContext context) {
-                                                                                                  return RoundedLoadingIndicator();
-                                                                                                });
-                                                                                            var token = Provider.of<UserData>(context, listen: false).user.userToken;
-                                                                                            if (await memberData.resetMemberMac(memberData.membersListScreenDropDownSearch[index].id, token, context) == "Success") {
-                                                                                              Navigator.pop(context);
-                                                                                              Fluttertoast.showToast(
-                                                                                                msg: "تم التعديل بنجاح",
-                                                                                                gravity: ToastGravity.CENTER,
-                                                                                                toastLength: Toast.LENGTH_SHORT,
-                                                                                                timeInSecForIosWeb: 1,
-                                                                                                backgroundColor: Colors.green,
-                                                                                                textColor: Colors.white,
-                                                                                                fontSize: 16.0,
-                                                                                              );
-                                                                                            } else {
-                                                                                              Fluttertoast.showToast(
-                                                                                                msg: "خطأ في التعديل",
-                                                                                                gravity: ToastGravity.CENTER,
-                                                                                                toastLength: Toast.LENGTH_SHORT,
-                                                                                                timeInSecForIosWeb: 1,
-                                                                                                backgroundColor: Colors.red,
-                                                                                                textColor: Colors.black,
-                                                                                                fontSize: 16.0,
-                                                                                              );
-                                                                                            }
+                                                                              Navigator.of(context).push(
+                                                                                new MaterialPageRoute(
+                                                                                  builder: (context) => AddUserScreen(memberData.membersListScreenDropDownSearch[index], index, true, phone[0], phone[1]),
+                                                                                ),
+                                                                              );
+                                                                            },
+                                                                            onResetMac:
+                                                                                () {
+                                                                              return showDialog(
+                                                                                  context: context,
+                                                                                  builder: (BuildContext context) {
+                                                                                    return RoundedAlert(
+                                                                                        onPressed: () async {
+                                                                                          showDialog(
+                                                                                              context: context,
+                                                                                              builder: (BuildContext context) {
+                                                                                                return RoundedLoadingIndicator();
+                                                                                              });
+                                                                                          var token = Provider.of<UserData>(context, listen: false).user.userToken;
+                                                                                          if (await memberData.resetMemberMac(memberData.membersListScreenDropDownSearch[index].id, token, context) == "Success") {
                                                                                             Navigator.pop(context);
-                                                                                            Navigator.pop(context);
-                                                                                          },
-                                                                                          title: 'إعادة ضبط بيانات مستخدم',
-                                                                                          content: "هل تريد اعادة ضبط بيانات هاتف المستخدم؟");
-                                                                                    });
-                                                                              },
-                                                                            );
-                                                                          }),
-                                                                ),
-                                                              )
-                                                            : Center(
-                                                                child:
-                                                                    AutoSizeText(
-                                                                  "لا يوجد مستخدمين بهذا الموقع\nبرجاء اضافة مستخدمين",
-                                                                  maxLines: 1,
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  style: TextStyle(
-                                                                      height: 2,
-                                                                      fontSize: ScreenUtil().setSp(
-                                                                          16,
-                                                                          allowFontScalingSelf:
-                                                                              true),
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w700),
-                                                                ),
-                                                              )),
-                                                  ],
-                                                );
-                                              default:
-                                                return Center(
-                                                  child: Platform.isIOS
-                                                      ? CupertinoActivityIndicator(
-                                                          radius: 20,
-                                                        )
-                                                      : CircularProgressIndicator(
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          valueColor:
-                                                              new AlwaysStoppedAnimation<
-                                                                      Color>(
-                                                                  Colors
-                                                                      .orange),
-                                                        ),
-                                                );
-                                            }
-                                          });
+                                                                                            Fluttertoast.showToast(
+                                                                                              msg: "تم التعديل بنجاح",
+                                                                                              gravity: ToastGravity.CENTER,
+                                                                                              toastLength: Toast.LENGTH_SHORT,
+                                                                                              timeInSecForIosWeb: 1,
+                                                                                              backgroundColor: Colors.green,
+                                                                                              textColor: Colors.white,
+                                                                                              fontSize: 16.0,
+                                                                                            );
+                                                                                          } else {
+                                                                                            Fluttertoast.showToast(
+                                                                                              msg: "خطأ في التعديل",
+                                                                                              gravity: ToastGravity.CENTER,
+                                                                                              toastLength: Toast.LENGTH_SHORT,
+                                                                                              timeInSecForIosWeb: 1,
+                                                                                              backgroundColor: Colors.red,
+                                                                                              textColor: Colors.black,
+                                                                                              fontSize: 16.0,
+                                                                                            );
+                                                                                          }
+                                                                                          Navigator.pop(context);
+                                                                                          Navigator.pop(context);
+                                                                                        },
+                                                                                        title: 'إعادة ضبط بيانات مستخدم',
+                                                                                        content: "هل تريد اعادة ضبط بيانات هاتف المستخدم؟");
+                                                                                  });
+                                                                            },
+                                                                          );
+                                                                        }),
+                                                              ),
+                                                            )
+                                                          : Center(
+                                                              child:
+                                                                  AutoSizeText(
+                                                                "لا يوجد مستخدمين بهذا الموقع\nبرجاء اضافة مستخدمين",
+                                                                maxLines: 1,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style: TextStyle(
+                                                                    height: 2,
+                                                                    fontSize: ScreenUtil().setSp(
+                                                                        16,
+                                                                        allowFontScalingSelf:
+                                                                            true),
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w700),
+                                                              ),
+                                                            )),
+                                            ],
+                                          );
+                                        default:
+                                          return Center(
+                                            child: Platform.isIOS
+                                                ? CupertinoActivityIndicator(
+                                                    radius: 20,
+                                                  )
+                                                : CircularProgressIndicator(
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    valueColor:
+                                                        new AlwaysStoppedAnimation<
+                                                                Color>(
+                                                            Colors.orange),
+                                                  ),
+                                          );
+                                      }
                                     });
                               }),
                         ),
@@ -886,6 +848,50 @@ class _UsersScreenState extends State<UsersScreen> {
         (Route<dynamic> route) => false);
     return Future.value(false);
   }
+}
+
+Widget buildShimmer(int count) {
+  return ListView.builder(
+    itemCount: 10,
+    itemBuilder: (context, index) {
+      return Card(
+        elevation: 5,
+        child: Container(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Directionality(
+                textDirection: ui.TextDirection.rtl,
+                child: Row(
+                  children: [
+                    Shimmer.fromColors(
+                        child: Container(
+                          width: 64.w,
+                          height: 64.h,
+                          child: CircleAvatar(),
+                          padding: EdgeInsets.all(5),
+                        ),
+                        baseColor: Colors.grey[400],
+                        highlightColor: Colors.grey[300]),
+                    Container(
+                      child: Shimmer.fromColors(
+                          child: Container(
+                            height: 40.h,
+                            width: 200,
+                            child: SizedBox(
+                              child: Text("جارى التحميل"),
+                            ),
+                            padding: EdgeInsets.only(top: 10.h, right: 5.w),
+                          ),
+                          baseColor: Colors.grey[400],
+                          highlightColor: Colors.grey[300]),
+                    )
+                  ],
+                )),
+          ),
+        ),
+      );
+    },
+  );
 }
 
 class MemberTile extends StatefulWidget {
@@ -1022,23 +1028,6 @@ class _MemberTileState extends State<MemberTile> {
                               ),
                             ),
                           ),
-                          // Container(
-                          //   width: 60.w,
-                          //   height: 60.h,
-                          //   decoration: BoxDecoration(
-                          //     shape: BoxShape.circle,
-                          //     image: DecorationImage(
-                          //       fit: BoxFit.fill,
-                          //       image: NetworkImage(
-                          //         '$baseURL/${widget.user.userImageURL}',
-                          //       ),
-                          //     ),
-                          //     border: Border.all(
-                          //       width: 1,
-                          //       color: Color(0xffFF7E00),
-                          //     ),
-                          //   ),
-                          // ),
                           SizedBox(
                             width: 10.w,
                           ),
