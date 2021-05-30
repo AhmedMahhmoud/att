@@ -6,6 +6,7 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:flutter_is_emulator/flutter_is_emulator.dart';
 import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -113,7 +114,7 @@ notifyListeners();
           var companyId = decodedRes["companyData"]["id"];
 
           var msg = await Provider.of<CompanyData>(context, listen: false)
-              .getCompanyProfileApi(companyId, user.userToken);
+              .getCompanyProfileApi(companyId, user.userToken,context);
 
           if (msg == "Success") {
             print("login -------------- ${user.userSiteId} ");
@@ -512,7 +513,8 @@ notifyListeners();
     if (Platform.isIOS) {
       if (enabled) {
         bool isMock = await detectJailBreak();
-        if (!isMock) {
+        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
+        if (!isMock && !isEmulator) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {
@@ -530,7 +532,8 @@ notifyListeners();
     } else {
       if (enabled) {
         bool isMockLocation = await TrustLocation.isMockLocation;
-        if (!isMockLocation) {
+                        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
+        if (!isMockLocation && !isEmulator) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {

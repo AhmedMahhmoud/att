@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 import 'package:qr_users/constants.dart';
-
+import 'package:qr_users/services/defaultClass.dart';
+import 'package:qr_users/services/user_data.dart';
 class Member {
   String name;
   int userType;
@@ -53,6 +55,7 @@ class MemberData with ChangeNotifier {
     "موارد بشرية",
     "ادمن",
   ];
+  InheritDefault inherit=InheritDefault();
   List<Member> membersList = [];
   List<Member> membersListScreenDropDownSearch = [];
   List<Member> dropDownMembersList = [];
@@ -95,18 +98,18 @@ class MemberData with ChangeNotifier {
     return false;
   }
 
-  getAllCompanyMember(int siteId, int companyId, String userToken) {
+  getAllCompanyMember(int siteId, int companyId, String userToken,BuildContext context) {
     String url = "";
     if (siteId == -1) {
       url = "$baseURL/api/Users/GetAllEmployeeInCompany?companyId=$companyId";
     } else {
       url = "$baseURL/api/Users/GetAllEmployeeInSite?siteId=$siteId";
     }
-    futureListener = getAllCompanyMemberApi(url, userToken, siteId);
+    futureListener = getAllCompanyMemberApi(url, userToken, siteId,context);
     return futureListener;
   }
 
-  getAllCompanyMemberApi(String url, String userToken, int siteId) async {
+  getAllCompanyMemberApi(String url, String userToken, int siteId,BuildContext context) async {
     print("get all members");
     List<Member> memberNewList;
     if (await isConnectedToInternet()) {
@@ -116,10 +119,17 @@ class MemberData with ChangeNotifier {
           'Authorization': "Bearer $userToken"
         });
 
-        var decodedRes = json.decode(response.body);
+   
+        if (response.statusCode==401)
+        {   
+            await inherit.login(context);
+            userToken= Provider.of<UserData>(context,listen: false).user.userToken;
+            await getAllCompanyMemberApi(url, userToken, siteId, context);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {     var decodedRes = json.decode(response.body);
         print(response.body);
-
-        if (decodedRes["message"] == "Success") {
+ if (decodedRes["message"] == "Success") {
           var memberObjJson = jsonDecode(response.body)['data'] as List;
           memberNewList = memberObjJson
               .map((memberJson) => Member.fromJson(memberJson))
@@ -136,6 +146,8 @@ class MemberData with ChangeNotifier {
             "Failed : user name and password not match ") {
           return "wrong";
         }
+        }
+ 
       } catch (e) {
         print(e);
       }
@@ -145,12 +157,12 @@ class MemberData with ChangeNotifier {
     }
   }
 
-  getAllSiteMembers(int siteId, String userToken) {
-    futureListener = getAllSiteMembersApi(siteId, userToken);
+  getAllSiteMembers(int siteId, String userToken,BuildContext context) {
+    futureListener = getAllSiteMembersApi(siteId, userToken,context);
     return futureListener;
   }
 
-  getAllSiteMembersApi(int siteId, String userToken) async {
+  getAllSiteMembersApi(int siteId, String userToken,BuildContext context) async {
     print("get all members");
     List<Member> memberNewList;
     if (await isConnectedToInternet()) {
@@ -162,10 +174,17 @@ class MemberData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
+  
+                       if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await getAllSiteMembersApi(siteId, userToken, context);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
         print(response.body);
-
-        if (decodedRes["message"] == "Success") {
+  if (decodedRes["message"] == "Success") {
           var memberObjJson = jsonDecode(response.body)['data'] as List;
           memberNewList = memberObjJson
               .map((memberJson) => Member.fromJson(memberJson))
@@ -179,6 +198,8 @@ class MemberData with ChangeNotifier {
             "Failed : user name and password not match ") {
           return "wrong";
         }
+        }
+      
       } catch (e) {
         print(e);
       }
@@ -229,15 +250,22 @@ class MemberData with ChangeNotifier {
     }
   }
 
-  deleteMember(String id, int listIndex, String userToken) async {
+  deleteMember(String id, int listIndex, String userToken,BuildContext context) async {
     if (await isConnectedToInternet()) {
       try {
         final response = await http.delete("$baseURL/api/Users/$id", headers: {
           'Content-type': 'application/json',
           'Authorization': "Bearer $userToken"
         });
-
-        var decodedRes = json.decode(response.body);
+                  if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await deleteMember(id,listIndex, userToken, context);
+        }
+             else if (response.statusCode==200 || response.statusCode==201)
+             {
+     var decodedRes = json.decode(response.body);
         print(response.body);
 
         if (decodedRes["message"] == "Success : User Deleted Successfully") {
@@ -251,6 +279,8 @@ class MemberData with ChangeNotifier {
             "Failed : user name and password not match ") {
           return "wrong";
         }
+             }
+   
       } catch (e) {
         print(e);
       }
@@ -260,7 +290,7 @@ class MemberData with ChangeNotifier {
     }
   }
 
-  addMember(Member member, String userToken) async {
+  addMember(Member member, String userToken,BuildContext context )async {
     if (await isConnectedToInternet()) {
       try {
         final response = await http.post("$baseURL/api/Authenticate/register",
@@ -279,8 +309,17 @@ class MemberData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
+                  if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await addMember(member,userToken, context);
+        }
+             else if (response.statusCode==200 || response.statusCode==201)
+             {
+     var decodedRes = json.decode(response.body);
         print(response.body);
+      
 
         if (decodedRes["message"] == "User created successfully!") {
           var userId = decodedRes['data']['userId'];
@@ -295,7 +334,7 @@ class MemberData with ChangeNotifier {
           return "exists";
         } else if (decodedRes["message"] == "Fail : Users Limit Reached") {
           return "Limit Reached";
-        }
+        }}
       } catch (e) {
         print(e);
       }
@@ -305,7 +344,7 @@ class MemberData with ChangeNotifier {
     }
   }
 
-  editMember(Member member, int id, String userToken) async {
+  editMember(Member member, int id, String userToken,BuildContext context) async {
     print(
         "Shift id ${member.shiftId} , userType id ${member.userType}  , memid : ${member.id}");
 
@@ -329,8 +368,19 @@ class MemberData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
+                  if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await editMember(member,id,userToken, context);
+        }
+             else if (response.statusCode==200 || response.statusCode==201)
+             {
+     var decodedRes = json.decode(response.body);
         print(response.body);
+      
+
+ 
 
         if (decodedRes["message"] == "Success : User Updated Successfully ") {
           membersList[id] = member;
@@ -347,7 +397,7 @@ class MemberData with ChangeNotifier {
           return "Success";
         } else if (decodedRes["message"] == "Failed : Email Already Exist") {
           return "exists";
-        }
+        }}
       } catch (e) {
         print(e);
       }

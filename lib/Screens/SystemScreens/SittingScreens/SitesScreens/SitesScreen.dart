@@ -50,7 +50,7 @@ class _SitesScreenState extends State<SitesScreen> {
     print("refresh");
     // if failed,use refreshFailed()
     await Provider.of<SiteData>(context, listen: false).getSitesByCompanyId(
-        companyProvider.com.id, userProvider.user.userToken);
+        companyProvider.com.id, userProvider.user.userToken,context);
   }
 
   getData() async {
@@ -59,12 +59,12 @@ class _SitesScreenState extends State<SitesScreen> {
 
     if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
       await Provider.of<SiteData>(context, listen: false).getSitesByCompanyId(
-          companyProvider.com.id, userProvider.user.userToken);
+          companyProvider.com.id, userProvider.user.userToken,context);
     }
     if (Provider.of<ShiftsData>(context, listen: false).shiftsList.isEmpty) {
       await Provider.of<ShiftsData>(context, listen: false)
           .getAllCompanyShifts(
-              companyProvider.com.id, userProvider.user.userToken)
+              companyProvider.com.id, userProvider.user.userToken,context)
           .then((value) async {
         print("got Shifts");
       });
@@ -176,7 +176,7 @@ class _SitesScreenState extends State<SitesScreen> {
                                                                           index]
                                                                       .id,
                                                                   token,
-                                                                  index);
+                                                                  index,context);
                                                           if (msg ==
                                                               "Success") {
                                                             Navigator.pop(

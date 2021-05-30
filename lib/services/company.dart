@@ -3,12 +3,15 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_is_emulator/flutter_is_emulator.dart';
 import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_users/services/MemberData.dart';
+import 'package:qr_users/services/defaultClass.dart';
+import 'package:qr_users/services/user_data.dart';
 import 'package:trust_location/trust_location.dart';
 
 import '../constants.dart';
@@ -38,6 +41,7 @@ class Company {
 
 class CompanyData extends ChangeNotifier {
   final _apiToken = 'ByYM000OLlMQG6VVVp1OH7Xzyr7gHuw1qvUC5dcGt3SNM';
+  InheritDefault inheritDefault=InheritDefault();
   Position _currentPosition;
   int companyId = -1;
   Company com = Company(
@@ -63,7 +67,7 @@ class CompanyData extends ChangeNotifier {
     return false;
   }
 
-  getCompanyProfileApi(int companyId, String userToken) async {
+  getCompanyProfileApi(int companyId, String userToken,BuildContext context) async {
     if (await isConnectedToInternet()) {
       try {
         final response = await http.get(
@@ -72,16 +76,20 @@ class CompanyData extends ChangeNotifier {
               'Content-type': 'application/json',
               'Authorization': "Bearer $userToken"
             });
-        print(userToken);
-        var decodedRes = json.decode(response.body);
-        print(decodedRes);
 
-        if (decodedRes["message"] == "Success") {
+        if (response.statusCode==401)
+        {
+  await inheritDefault.login(context);
+  userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+await getCompanyProfileApi(companyId, userToken, context);
+        }
+              else if (response.statusCode==200 || response.statusCode==201){
+      var decodedRes = json.decode(response.body);
+          if (decodedRes["message"] == "Success") {
           com.id = decodedRes["data"]["id"];
           com.nameAr = decodedRes["data"]["nameAr"];
           com.nameEn = decodedRes["data"]["nameEn"];
           com.logo = "$baseURL/${decodedRes["data"]["logo"]}";
-
           com.email = decodedRes["data"]["companyEmail"] ?? "";
           com.companyUsers = decodedRes["data"]["companyUsers"];
           com.companySites = decodedRes["data"]["companySites"];
@@ -92,13 +100,16 @@ class CompanyData extends ChangeNotifier {
             "Failed : user name and password not match ") {
           return "wrong";
         }
-      } catch (e) {
+      } 
+      return "failed";
+    }catch (e) {
         print(e);
       }
-      return "failed";
-    } else {
+ 
+              }    else {
       return 'noInternet';
     }
+    
   }
 
   static Future<bool> detectJailBreak() async {
@@ -123,7 +134,8 @@ class CompanyData extends ChangeNotifier {
       // && pos[0] != null
       if (enabled) {
         bool isMockLocation = await TrustLocation.isMockLocation;
-        if (!isMockLocation) {
+                        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
+        if (!isMockLocation && !isEmulator) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {
@@ -146,7 +158,8 @@ class CompanyData extends ChangeNotifier {
       // && pos[0] != null
       if (enabled) {
         bool isMockLocation = await detectJailBreak();
-        if (!isMockLocation) {
+                        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
+        if (!isMockLocation && !isEmulator) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {
@@ -308,7 +321,7 @@ class CompanyData extends ChangeNotifier {
                   email: company.email,
                   shiftId: defaultShiftID,
                   userType: 4),
-              guestToken)
+              guestToken,context)
           .then((value) async {
         return value;
       });
@@ -316,7 +329,7 @@ class CompanyData extends ChangeNotifier {
     }
   }
 
-  Future<String> editCompanyProfile(Company com, String token) async {
+  Future<String> editCompanyProfile(Company com, String token,BuildContext context) async {
     if (await isConnectedToInternet()) {
       try {
         final response = await http.put("$baseURL/api/Users/UpdatePassword",
@@ -336,7 +349,11 @@ class CompanyData extends ChangeNotifier {
         var decodedRes = json.decode(response.body);
         print(response.body);
         print(decodedRes["message"]);
-
+        if (response.statusCode==401)
+        {
+        await  inheritDefault.login(context);
+        await editCompanyProfile(com, token, context);
+        }
         if (decodedRes["message"] == "Success : password updated successfuly") {
           return "success";
         } else {

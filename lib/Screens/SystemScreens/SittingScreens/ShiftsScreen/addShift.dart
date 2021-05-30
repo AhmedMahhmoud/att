@@ -697,7 +697,7 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
             shiftStartTime: int.parse(startString.replaceAll(":", "")),
             shiftEndTime: int.parse(endString.replaceAll(":", ""))),
         widget.id,
-        user);
+        user.userToken,context);
 
     if (msg == "Success") {
       setState(() {
@@ -775,7 +775,7 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
                 .id,
             shiftStartTime: int.parse(startString.replaceAll(":", "")),
             shiftEndTime: int.parse(endString.replaceAll(":", ""))),
-        user.userToken);
+        user.userToken,context);
     Navigator.pop(context);
 
     if (msg == "Success") {

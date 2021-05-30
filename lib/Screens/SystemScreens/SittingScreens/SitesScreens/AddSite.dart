@@ -216,7 +216,7 @@ class _AddSiteScreenState extends State<AddSiteScreen> {
                                                   long: widget.site.long,
                                                   lat: widget.site.lat),
                                               com.id,
-                                              userToken);
+                                              userToken,context);
                                       Navigator.pop(context);
                                       if (msg == "Success") {
                                         Fluttertoast.showToast(
@@ -355,7 +355,7 @@ class _AddSiteScreenState extends State<AddSiteScreen> {
                                                                         .lat),
                                                                 com.id,
                                                                 userToken,
-                                                                widget.id);
+                                                                widget.id,context);
 
                                                         if (msg == "Success") {
                                                           Fluttertoast.showToast(

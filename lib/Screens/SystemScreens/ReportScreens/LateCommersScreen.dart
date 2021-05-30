@@ -69,12 +69,12 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
     if (userProvider.user.userType == 2) {
       siteID = userProvider.user.userSiteId;
       siteData = await Provider.of<SiteData>(context, listen: false)
-          .getSpecificSite(siteID, userProvider.user.userToken);
+          .getSpecificSite(siteID, userProvider.user.userToken,context);
     } else {
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
-                comProvider.com.id, userProvider.user.userToken)
+                comProvider.com.id, userProvider.user.userToken,context)
             .then((value) {
           siteID = Provider.of<SiteData>(context, listen: false)
               .sitesList[siteIndex]
@@ -87,7 +87,7 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
       }
     }
     await Provider.of<ReportsData>(context, listen: false).getLateAbsenceReport(
-        userProvider.user.userToken, siteID, dateFromString, dateToString);
+        userProvider.user.userToken, siteID, dateFromString, dateToString,context);
     print(Provider.of<ReportsData>(context, listen: false)
         .lateAbsenceReport
         .absentRatio);
@@ -279,7 +279,7 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
                                                                     user.userToken,
                                                                     user.userSiteId,
                                                                     dateFromString,
-                                                                    dateToString);
+                                                                    dateToString,context);
                                                           } else {
                                                             await Provider.of<
                                                                         ReportsData>(
@@ -297,7 +297,7 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
                                                                             siteIdIndex]
                                                                         .id,
                                                                     dateFromString,
-                                                                    dateToString);
+                                                                    dateToString,context);
                                                           }
                                                         }
                                                       },
@@ -405,7 +405,7 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
                                                               userToken,
                                                               siteId,
                                                               dateFromString,
-                                                              dateToString);
+                                                              dateToString,context);
                                                     }
                                                     print(value);
                                                   },
@@ -602,7 +602,7 @@ class DataTableRow extends StatelessWidget {
                 userProvider.userToken,
                 userAttendanceReportUnit.userId,
                 formatter.format(fromDate),
-                formatter.format(toDate));
+                formatter.format(toDate),context);
         print("Success $x");
         if (x == "Success") {
           Navigator.pop(context);

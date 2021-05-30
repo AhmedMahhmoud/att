@@ -137,47 +137,46 @@ class _RoundedBorderDropdownState extends State<RoundedBorderDropdown> {
           children: [
             Icon(Icons.arrow_drop_down),
             Expanded(
-              child: DropdownButtonHideUnderline(
-                  child: DropdownButton(
+              child: DropdownButton(
                 icon: Icon(
-                  widget.icon,
-                  color: Colors.orange,
+              widget.icon,
+              color: Colors.orange,
                 ),
                 elevation: 2,
                 isExpanded: true,
                 items: widget.list.map((String x) {
-                  return DropdownMenuItem<String>(
-                      value: x,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Container(
-                                height: 20,
-                                child: AutoSizeText(
-                                  x,
-                                  maxLines: 1,
-                                  textAlign: TextAlign.end,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              ),
+              return DropdownMenuItem<String>(
+                  value: x,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 10),
+                          child: Container(
+                            height: 20,
+                            child: AutoSizeText(
+                              x,
+                              maxLines: 1,
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
-                        ],
-                      ));
+                        ),
+                      ),
+                    ],
+                  ));
                 }).toList(),
                 onChanged: (value) {
-                  widget.onChange(value);
-                  setState(() {
-                    widget.selectedvalue = value;
-                  });
+              widget.onChange(value);
+              setState(() {
+                widget.selectedvalue = value;
+              });
                 },
                 value: widget.selectedvalue,
-              )),
+              ),
             ),
           ],
         ),
@@ -229,46 +228,45 @@ class _ShiftsDropDownState extends State<ShiftsDropDown> {
           children: [
             Icon(Icons.arrow_drop_down),
             Expanded(
-              child: DropdownButtonHideUnderline(
-                  child: DropdownButton(
+              child: DropdownButton(
                 icon: Icon(
-                  widget.icon,
-                  color: Colors.orange,
+              widget.icon,
+              color: Colors.orange,
                 ),
                 elevation: 2,
                 isExpanded: true,
                 items: widget.list.map((Shift x) {
-                  return DropdownMenuItem<String>(
-                      value: x.shiftName,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 5),
-                              child: Container(
-                                height: 20,
-                                child: AutoSizeText(
-                                  x.shiftName,
-                                  maxLines: 1,
-                                  textAlign: TextAlign.end,
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              ),
+              return DropdownMenuItem<String>(
+                  value: x.shiftName,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 5),
+                          child: Container(
+                            height: 20,
+                            child: AutoSizeText(
+                              x.shiftName,
+                              maxLines: 1,
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
-                        ],
-                      ));
+                        ),
+                      ),
+                    ],
+                  ));
                 }).toList(),
                 onChanged: (value) {
-                  widget.onChange(value);
-                  setState(() {
-                    widget.selectedvalue = value;
-                  });
+              widget.onChange(value);
+              setState(() {
+                widget.selectedvalue = value;
+              });
                 },
                 value: widget.selectedvalue,
-              )),
+              ),
             ),
           ],
         ),

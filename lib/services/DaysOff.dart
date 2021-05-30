@@ -2,7 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:qr_users/constants.dart';
+import 'package:qr_users/services/defaultClass.dart';
+import 'package:qr_users/services/user_data.dart';
 
 class Day {
   String dayName;
@@ -20,7 +23,7 @@ class DaysOffData with ChangeNotifier {
     weak[i].isDayOff = true;
     notifyListeners();
   }
-
+InheritDefault inheritDefault = InheritDefault();
   Future future;
   Future<bool> isConnectedToInternet() async {
     try {
@@ -36,12 +39,12 @@ class DaysOffData with ChangeNotifier {
     return false;
   }
 
-  getDaysOff(int companyId, String userToken) {
-    future = getDaysOffApi(companyId, userToken);
+  getDaysOff(int companyId, String userToken,BuildContext context) {
+    future = getDaysOffApi(companyId, userToken,context);
     return future;
   }
 
-  getDaysOffApi(int companyId, String userToken) async {
+  getDaysOffApi(int companyId, String userToken,BuildContext context) async {
     print("$baseURL/api/DaysOff/GetCompanyDaysOff/$companyId");
     if (await isConnectedToInternet()) {
       try {
@@ -51,10 +54,19 @@ class DaysOffData with ChangeNotifier {
           'Authorization': "Bearer $userToken"
         });
 
-        var decodedRes = json.decode(response.body);
-        print(decodedRes);
+     
 
-        if (decodedRes["message"] == "Success") {
+               if (response.statusCode==401)
+        {
+  await inheritDefault.login(context);
+  userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+await getDaysOffApi(companyId, userToken, context);
+        } 
+            else if (response.statusCode==200 || response.statusCode==201)
+
+        {
+   var decodedRes = json.decode(response.body);
+   if (decodedRes["message"] == "Success") {
           weak[0].isDayOff = decodedRes["data"]["saturDay"] as bool;
           weak[0].dayName = "السبت";
 
@@ -82,6 +94,8 @@ class DaysOffData with ChangeNotifier {
             "Failed : user name and password not match ") {
           return "wrong";
         }
+        }
+     
       } catch (e) {
         print(e);
       }
@@ -91,7 +105,7 @@ class DaysOffData with ChangeNotifier {
     }
   }
 
-  editDaysOffApi(int companyId, String userToken) async {
+  editDaysOffApi(int companyId, String userToken,BuildContext context) async {
     if (await isConnectedToInternet()) {
       try {
         final response = await http.put(
@@ -112,8 +126,15 @@ class DaysOffData with ChangeNotifier {
                 "companyId": companyId
               },
             ));
-
-        var decodedRes = json.decode(response.body);
+               if (response.statusCode==401)
+        {
+  await inheritDefault.login(context);
+  userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+await editDaysOffApi(companyId, userToken, context);
+        } 
+            else if (response.statusCode==200 || response.statusCode==201)
+            {
+ var decodedRes = json.decode(response.body);
         print(decodedRes);
 
         if (decodedRes["message"] == "Success : Update Successfully") {
@@ -143,13 +164,13 @@ class DaysOffData with ChangeNotifier {
         } else if (decodedRes["message"] ==
             "Failed : user name and password not match ") {
           return "wrong";
-        }
-      } catch (e) {
-        print(e);
-      }
+            }
+
+     
+      } 
       return "failed";
-    } else {
-      return 'noInternet';
-    }
-  }
+    }catch (e) {
+        print(e);
+      } 
+  }  return 'noInternet';}
 }

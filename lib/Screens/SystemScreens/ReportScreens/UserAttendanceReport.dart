@@ -96,14 +96,14 @@ class _UserAttendanceReportScreenState
     if (userProvider.user.userType == 2) {
       siteId = userProvider.user.userSiteId;
       siteData = await Provider.of<SiteData>(context, listen: false)
-          .getSpecificSite(siteId, userProvider.user.userToken);
+          .getSpecificSite(siteId, userProvider.user.userToken,context);
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken);
+          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
     } else {
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
-                comProvider.com.id, userProvider.user.userToken)
+                comProvider.com.id, userProvider.user.userToken,context)
             .then((value) async {
           print("Got Sites");
         });
@@ -111,7 +111,7 @@ class _UserAttendanceReportScreenState
       siteId = Provider.of<SiteData>(context, listen: false).sitesList[0].id;
 
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken);
+          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
     }
   }
 
@@ -315,7 +315,7 @@ class _UserAttendanceReportScreenState
                                                                     userToken,
                                                                     selectedId,
                                                                     dateFromString,
-                                                                    dateToString);
+                                                                    dateToString,context);
                                                           }
                                                         }
                                                       },
@@ -414,7 +414,7 @@ class _UserAttendanceReportScreenState
                                                                       listen:
                                                                           false)
                                                                   .user
-                                                                  .userToken);
+                                                                  .userToken,context);
                                                       setState(() {});
                                                     }
                                                     print(value);
@@ -508,7 +508,7 @@ class _UserAttendanceReportScreenState
                                                           userToken,
                                                           item.id,
                                                           dateFromString,
-                                                          dateToString);
+                                                          dateToString,context);
                                                 }
                                               },
                                               itemBuilder: (context, item) {

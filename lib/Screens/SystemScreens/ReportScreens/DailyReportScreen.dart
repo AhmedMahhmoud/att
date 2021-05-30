@@ -61,12 +61,12 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
     if (userProvider.user.userType == 2) {
       siteID = userProvider.user.userSiteId;
       siteData = await Provider.of<SiteData>(context, listen: false)
-          .getSpecificSite(siteID, userProvider.user.userToken);
+          .getSpecificSite(siteID, userProvider.user.userToken,context);
     } else {
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
-                comProvider.com.id, userProvider.user.userToken)
+                comProvider.com.id, userProvider.user.userToken,context)
             .then((value) {
           siteID = Provider.of<SiteData>(context, listen: false)
               .sitesList[siteIndex]
@@ -79,7 +79,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
       }
     }
     await Provider.of<ReportsData>(context, listen: false)
-        .getDailyReportUnits(userProvider.user.userToken, siteID, date);
+        .getDailyReportUnits(userProvider.user.userToken, siteID, date,context);
   }
 
   int getSiteId(String siteName) {
@@ -587,12 +587,12 @@ class _DataTableRowState extends State<DataTableRow> {
     if (userProvider.user.userType == 2) {
       siteId = userProvider.user.userSiteId;
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken);
+          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
     } else {
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
-                comProvider.com.id, userProvider.user.userToken)
+                comProvider.com.id, userProvider.user.userToken,context)
             .then((value) async {
           print("Got Sites");
         });
@@ -600,7 +600,7 @@ class _DataTableRowState extends State<DataTableRow> {
       siteId = Provider.of<SiteData>(context, listen: false).sitesList[0].id;
 
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken);
+          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
     }
   }
 
@@ -632,7 +632,7 @@ class _DataTableRowState extends State<DataTableRow> {
                         userProvider.userToken,
                         widget.attendUnit.userId,
                         formatter.format(fromDate),
-                        formatter.format(toDate))
+                        formatter.format(toDate),context)
                     .then((value) {
                   print("value $value");
                   if (value == "Success") {

@@ -3,7 +3,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:qr_users/constants.dart';
+import 'package:qr_users/services/defaultClass.dart';
+import 'package:qr_users/services/user_data.dart';
 
 class Site {
   int id;
@@ -29,7 +32,7 @@ class SiteData with ChangeNotifier {
   List<String> dropdownIndexes = [];
   int dropIndex = 0;
   String currentSiteName = "";
-
+InheritDefault inherit = InheritDefault();
   String siteValue = 'كل المواقع';
   setSiteValue(String v) {
     siteValue = v;
@@ -75,7 +78,7 @@ class SiteData with ChangeNotifier {
     });
   }
 
-  deleteSite(int id, String userToken, int listIndex) async {
+  deleteSite(int id, String userToken, int listIndex,BuildContext context) async {
     if (await isConnectedToInternet()) {
       try {
         final response = await http.delete("$baseURL/api/Sites/$id", headers: {
@@ -83,8 +86,16 @@ class SiteData with ChangeNotifier {
           'Authorization': "Bearer $userToken"
         });
 
-        var decodedRes = json.decode(response.body);
+  if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await deleteSite(id, userToken,listIndex, context,);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
         print(response.body);
+
 
         if (decodedRes["message"] == "Success") {
           sitesList.removeAt(listIndex);
@@ -98,7 +109,7 @@ class SiteData with ChangeNotifier {
         } else if (decodedRes["message"] ==
             "Fail : You must delete all shifts in site then delete site") {
           return "hasData";
-        }
+        }}
       } catch (e) {
         print(e);
       }
@@ -108,7 +119,7 @@ class SiteData with ChangeNotifier {
     }
   }
 
-  Future<Site> getSpecificSite(int id, String userToken) async {
+  Future<Site> getSpecificSite(int id, String userToken,BuildContext context) async {
     Site site;
     if (await isConnectedToInternet()) {
       try {
@@ -117,8 +128,16 @@ class SiteData with ChangeNotifier {
           'Authorization': "Bearer $userToken"
         });
 
-        var decodedRes = json.decode(response.body);
+        if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await getSpecificSite(id, userToken, context,);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
         print(response.body);
+
 
         if (decodedRes["message"] == "Success") {
           site = Site(
@@ -131,7 +150,7 @@ class SiteData with ChangeNotifier {
         } else if (decodedRes["message"] ==
             "Fail : You must delete all shifts in site then delete site") {
           return null;
-        }
+        }}
       } catch (e) {
         print(e);
       }
@@ -141,12 +160,12 @@ class SiteData with ChangeNotifier {
     }
   }
 
-  Future getSitesByCompanyId(int companyId, String userToken) async {
-    futureListener = getSitesByCompanyIdApi(companyId, userToken);
+  Future getSitesByCompanyId(int companyId, String userToken,BuildContext context) async {
+    futureListener = getSitesByCompanyIdApi(companyId, userToken,context);
     return futureListener;
   }
 
-  getSitesByCompanyIdApi(int companyId, String userToken) async {
+  getSitesByCompanyIdApi(int companyId, String userToken,BuildContext context) async {
     if (await isConnectedToInternet()) {
       try {
         dropDownSitesStrings = [];
@@ -157,7 +176,14 @@ class SiteData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
+   if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await getSitesByCompanyIdApi(companyId, userToken, context,);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
         print(response.body);
 
         if (decodedRes["message"] == "Success") {
@@ -177,7 +203,7 @@ class SiteData with ChangeNotifier {
         } else if (decodedRes["message"] ==
             "Failed : user name and password not match ") {
           return null;
-        }
+        }}
       } catch (e) {
         print(e);
       }
@@ -201,7 +227,7 @@ class SiteData with ChangeNotifier {
     return false;
   }
 
-  addSite(Site site, int companyId, String userToken) async {
+  addSite(Site site, int companyId, String userToken,BuildContext context) async {
     if (await isConnectedToInternet()) {
       try {
         dropDownSitesStrings = [];
@@ -219,8 +245,16 @@ class SiteData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
+   if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await addSite(site, companyId,userToken, context,);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
         print(response.body);
+
 
         if (decodedRes["message"] == "Success") {
           Site newSite = Site(
@@ -239,7 +273,7 @@ class SiteData with ChangeNotifier {
           return "exists";
         } else if (decodedRes["message"] == "Fail : Sites Limit Reached") {
           return "Limit Reached";
-        }
+        }}
       } catch (e) {
         print(e);
       }
@@ -249,7 +283,7 @@ class SiteData with ChangeNotifier {
     }
   }
 
-  editSite(Site site, int companyId, String userToken, int id) async {
+  editSite(Site site, int companyId, String userToken, int id,BuildContext context) async {
     print(
         " id:${site.id}  name:${site.name} long:${site.long} lat:${site.lat} comId:$companyId , listId:$id");
 
@@ -271,8 +305,17 @@ class SiteData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
+ 
+   if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await editSite(site, companyId,userToken,id, context,);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
         print(response.body);
+
 
         if (decodedRes["message"] == "Success") {
           Site newSite = Site(
@@ -292,7 +335,7 @@ class SiteData with ChangeNotifier {
         } else if (decodedRes["message"] ==
             "Fail : The same Site name already exists in company") {
           return "exists";
-        }
+        }}
       } catch (e) {
         print(e);
       }

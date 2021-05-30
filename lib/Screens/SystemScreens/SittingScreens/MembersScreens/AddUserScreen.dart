@@ -688,7 +688,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                   ),
                                               name:
                                                   _nameController.text.trim()),
-                                          token,
+                                          token,context
                                         );
                                         Navigator.pop(context);
                                         if (msg == "Success") {
@@ -850,7 +850,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                       name: _nameController
                                                                           .text),
                                                                   widget.id,
-                                                                  token);
+                                                                  token,context);
 
                                                           if (msg ==
                                                               "Success") {

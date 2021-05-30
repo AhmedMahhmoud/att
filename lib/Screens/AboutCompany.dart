@@ -508,7 +508,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                                                                                 listen: false)
                                                                             .com
                                                                             .id),
-                                                                    token);
+                                                                    token,context);
 
                                                             if (msg ==
                                                                 "success") {

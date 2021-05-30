@@ -346,7 +346,7 @@ class _UsersScreenState extends State<UsersScreen> {
             .dropDownSitesList[siteIndex]
             .id,
         comProvier.com.id,
-        userProvider.user.userToken);
+        userProvider.user.userToken,context);
     refreshController.refreshCompleted();
   }
 
@@ -363,14 +363,14 @@ class _UsersScreenState extends State<UsersScreen> {
 
     if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
       await Provider.of<SiteData>(context, listen: false)
-          .getSitesByCompanyId(comProvier.com.id, userProvider.user.userToken)
+          .getSitesByCompanyId(comProvier.com.id, userProvider.user.userToken,context)
           .then((value) async {
         print("Got Sites");
       });
     }
     if (Provider.of<ShiftsData>(context, listen: false).shiftsList.isEmpty) {
       await Provider.of<ShiftsData>(context, listen: false)
-          .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken)
+          .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken,context)
           .then((value) async {
         print("Got shifts");
       });
@@ -387,7 +387,7 @@ class _UsersScreenState extends State<UsersScreen> {
                     .dropDownSitesList[siteIndex]
                     .id,
                 comProvier.com.id,
-                userProvider.user.userToken);
+                userProvider.user.userToken,context);
 
         List<Member> finalTest = [];
 
@@ -410,12 +410,12 @@ class _UsersScreenState extends State<UsersScreen> {
                 .dropDownSitesList[siteIndex]
                 .id,
             comProvier.com.id,
-            userProvider.user.userToken);
+            userProvider.user.userToken,context);
       }
     } else {
       await Provider.of<MemberData>(context, listen: false)
           .getAllCompanyMember(
-              -1, comProvier.com.id, userProvider.user.userToken)
+              -1, comProvier.com.id, userProvider.user.userToken,context)
           .then((value) async {
         print("Got members");
       });
@@ -545,7 +545,7 @@ class _UsersScreenState extends State<UsersScreen> {
                                       switch (snapshot.connectionState) {
                                         case ConnectionState.waiting:
                                           return Container(
-                                              child: buildShimmer(10));
+                                              child: buildShimmer(5));
                                         case ConnectionState.done:
                                           return Column(
                                             children: [
@@ -599,7 +599,7 @@ class _UsersScreenState extends State<UsersScreen> {
                                                                   .com
                                                                   .id,
                                                               userProvider.user
-                                                                  .userToken);
+                                                                  .userToken,context);
                                                       setState(() {
                                                         widget.selectedValue =
                                                             Provider.of<SiteData>(
@@ -663,7 +663,7 @@ class _UsersScreenState extends State<UsersScreen> {
                                                                                                 return RoundedLoadingIndicator();
                                                                                               });
                                                                                           var token = Provider.of<UserData>(context, listen: false).user.userToken;
-                                                                                          if (await memberData.deleteMember(memberData.membersListScreenDropDownSearch[index].id, index, token) == "Success") {
+                                                                                          if (await memberData.deleteMember(memberData.membersListScreenDropDownSearch[index].id, index, token,context) == "Success") {
                                                                                             Navigator.pop(context);
                                                                                             Fluttertoast.showToast(
                                                                                               msg: "تم الحذف بنجاح",
@@ -816,6 +816,7 @@ class _UsersScreenState extends State<UsersScreen> {
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.startFloat,
               floatingActionButton: FloatingActionButton(
+                backgroundColor: Colors.transparent,
                 onPressed: () {
                   Navigator.push(
                       context,
@@ -852,7 +853,7 @@ class _UsersScreenState extends State<UsersScreen> {
 
 Widget buildShimmer(int count) {
   return ListView.builder(
-    itemCount: 10,
+    itemCount: count,
     itemBuilder: (context, index) {
       return Card(
         elevation: 5,

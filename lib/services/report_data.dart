@@ -4,7 +4,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_users/constants.dart';
+import 'package:qr_users/services/defaultClass.dart';
+import 'package:qr_users/services/user_data.dart';
 
 class DailyReportUnit {
   String userId;
@@ -248,7 +251,7 @@ class UserAttendanceReportUnit {
 class ReportsData with ChangeNotifier {
   Future futureListener;
   DailyReport dailyReport = DailyReport([], 0, 0, false);
-
+InheritDefault inherit=InheritDefault();
   UserAttendanceReport userAttendanceReport =
       UserAttendanceReport([], 0, 0, "", -1);
 
@@ -268,12 +271,12 @@ class ReportsData with ChangeNotifier {
     return false;
   }
 
-  getDailyReportUnits(String userToken, int siteId, String date) {
-    futureListener = getDailyReportUnitsApi(userToken, siteId, date);
+  getDailyReportUnits(String userToken, int siteId, String date,BuildContext context) {
+    futureListener = getDailyReportUnitsApi(userToken, siteId, date,context);
     return futureListener;
   }
 
-  getDailyReportUnitsApi(String userToken, int siteId, String date) async {
+  getDailyReportUnitsApi(String userToken, int siteId, String date,BuildContext context) async {
     List<DailyReportUnit> newReportList;
     if (await isConnectedToInternet()) {
       try {
@@ -284,9 +287,16 @@ class ReportsData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
-        print(response.body);
 
+                       if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await getDailyReportUnitsApi(userToken, siteId, date,context);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
+        print(response.body);
         if (decodedRes["message"] == "Success") {
           dailyReport.isHoliday = decodedRes['data']['isHoliDays'] as bool;
           dailyReport.totalAttend = decodedRes['data']['totalAttend'] as int;
@@ -311,7 +321,7 @@ class ReportsData with ChangeNotifier {
           return "holiday";
         } else {
           return "wrong";
-        }
+        }}
       } catch (e) {
         print(e);
       }
@@ -322,8 +332,8 @@ class ReportsData with ChangeNotifier {
   }
 
   getUserReportUnits(
-      String userToken, String userId, String dateFrom, String dateTo) {
-    futureListener = getUserReportUnitsApi(userToken, userId, dateFrom, dateTo);
+      String userToken, String userId, String dateFrom, String dateTo,BuildContext context) {
+    futureListener = getUserReportUnitsApi(userToken, userId, dateFrom, dateTo,context);
     return futureListener;
   }
 
@@ -340,7 +350,7 @@ class ReportsData with ChangeNotifier {
   }
 
   getUserReportUnitsApi(
-      String userToken, String userId, String dateFrom, String dateTo) async {
+      String userToken, String userId, String dateFrom, String dateTo,BuildContext context) async {
     print("UseriD $userId , dateFrom = $dateFrom , dataTo = $dateTo");
     List<UserAttendanceReportUnit> newReportList;
     if (await isConnectedToInternet()) {
@@ -352,7 +362,14 @@ class ReportsData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
+                       if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await getUserReportUnitsApi(userToken, userId, dateFrom,dateTo,context);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
         print(response.body);
 
         if (decodedRes["message"] == "Success") {
@@ -387,7 +404,7 @@ class ReportsData with ChangeNotifier {
         } else if (decodedRes["message"] ==
             "Failed : user name and password not match ") {
           return "wrong";
-        }
+        }}
       } catch (e) {
         print(e);
       }
@@ -398,14 +415,14 @@ class ReportsData with ChangeNotifier {
   }
 
   getLateAbsenceReport(
-      String userToken, int siteId, String dateFrom, String dateTo) {
+      String userToken, int siteId, String dateFrom, String dateTo,BuildContext context) {
     futureListener =
-        getLateAbsenceReportApi(userToken, siteId, dateFrom, dateTo);
+        getLateAbsenceReportApi(userToken, siteId, dateFrom, dateTo,context);
     return futureListener;
   }
 
   getLateAbsenceReportApi(
-      String userToken, int siteId, String dateFrom, String dateTo) async {
+      String userToken, int siteId, String dateFrom, String dateTo,BuildContext context) async {
     print("siteId $siteId , dateFrom = $dateFrom , dataTo = $dateTo");
     List<LateAbsenceReportUnit> newReportList;
     if (await isConnectedToInternet()) {
@@ -417,8 +434,17 @@ class ReportsData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-        var decodedRes = json.decode(response.body);
+    
+                       if (response.statusCode==401)
+        {
+        await  inherit.login(context);
+        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
+        await getLateAbsenceReportApi(userToken, siteId, dateFrom,dateTo,context);
+        }
+        else if (response.statusCode==200 || response.statusCode==201)
+        {      var decodedRes = json.decode(response.body);
         print(response.body);
+
 
         if (decodedRes["message"] == "Success") {
           lateAbsenceReport.absentRatio = decodedRes['data']['absentRatio'];
@@ -444,7 +470,7 @@ class ReportsData with ChangeNotifier {
         } else if (decodedRes["message"] ==
             "Failed : user name and password not match ") {
           return "wrong";
-        }
+        }}
       } catch (e) {
         print(e);
       }

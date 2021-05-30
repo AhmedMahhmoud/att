@@ -2,16 +2,19 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:get_mac/get_mac.dart';
+
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_users/Screens/AttendScanner.dart';
+
 import 'package:qr_users/services/user_data.dart';
 import 'package:qr_users/widgets/drawer.dart';
 import 'package:qr_users/widgets/headers.dart';
 import 'package:qr_users/widgets/roundedButton.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:device_info/device_info.dart';
+
+import 'package:flutter_is_emulator/flutter_is_emulator.dart';
+
 
 var cron1;
 var cron2;
@@ -22,6 +25,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  
   DateTime currentBackPressTime;
   @override
   Widget build(BuildContext context) {
@@ -31,7 +36,10 @@ class _HomePageState extends State<HomePage> {
     return WillPopScope(
         onWillPop: onWillPop,
         child: GestureDetector(
-          onTap: () async {},
+          onTap: () async {
+
+
+          },
           child: Scaffold(
             backgroundColor: Colors.white,
             drawer: userDataProvider.user.userType == 0 ? DrawerI() : null,

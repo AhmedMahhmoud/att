@@ -77,7 +77,7 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
       isLoading = true;
     });
     await Provider.of<ShiftsData>(context, listen: false)
-        .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken)
+        .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken,context)
         .then((value) async {
       print("got Shifts");
     });
@@ -110,14 +110,14 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
 
     if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
       await Provider.of<SiteData>(context, listen: false)
-          .getSitesByCompanyId(comProvier.com.id, userProvider.user.userToken)
+          .getSitesByCompanyId(comProvier.com.id, userProvider.user.userToken,context)
           .then((value) async {
         print("GOt Sites");
       });
     }
     if (Provider.of<ShiftsData>(context, listen: false).shiftsList.isEmpty) {
       await Provider.of<ShiftsData>(context, listen: false)
-          .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken)
+          .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken,context)
           .then((value) async {
         print("got Shifts");
       });
@@ -315,7 +315,7 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
                                                                                             builder: (BuildContext context) {
                                                                                               return RoundedLoadingIndicator();
                                                                                             });
-                                                                                        var msg = await shiftsData.deleteShift(shiftsData.shiftsBySite[index].shiftId, token, index);
+                                                                                        var msg = await shiftsData.deleteShift(shiftsData.shiftsBySite[index].shiftId, token, index,context);
 
                                                                                         if (msg == "Success") {
                                                                                           Navigator.pop(context);
