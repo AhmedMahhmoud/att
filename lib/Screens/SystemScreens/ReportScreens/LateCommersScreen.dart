@@ -207,11 +207,7 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
                                     return Column(
                                       children: [
                                         Container(
-                                            child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Theme(
+                                            child: Theme(
                                               data: clockTheme1,
                                               child: Builder(
                                                 builder: (context) {
@@ -236,9 +232,7 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
                                                           fromDate =
                                                               picked.first;
                                                           toDate = picked.last;
-                                                          // selectedDuration = kCalcDateDifferance(
-                                                          //     fromDate.toString(), toDate.toString());
-                                                          // selectedDuration += 1;
+                                                 
                                                           String fromText =
                                                               " من ${DateFormat('yMMMd').format(fromDate).toString()}";
                                                           String toText =
@@ -340,9 +334,7 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
                                                       ));
                                                 },
                                               ),
-                                            ),
-                                          ],
-                                        )),
+                                            )),
                                         SizedBox(
                                           height: 10.h,
                                         ),

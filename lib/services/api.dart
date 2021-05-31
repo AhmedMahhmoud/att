@@ -48,12 +48,6 @@ class ShiftApi with ChangeNotifier {
         bool enabled = false;
         enabled = await Geolocator.isLocationServiceEnabled();
         print("enable locaiton : $enabled");
-
-        // var pos2 = await Geolocator.getCurrentPosition();
-        // print(pos2.latitude);
-        // print(pos2.longitude);
-
-        // && pos[0] != null
         if (Platform.isIOS) {
           try {
             if (enabled) {

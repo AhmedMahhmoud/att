@@ -8,60 +8,15 @@ import 'package:qr_users/constants.dart';
 import 'package:qr_users/services/Shift.dart';
 import 'package:qr_users/services/defaultClass.dart';
 import 'package:qr_users/services/user_data.dart';
-import "CopmanySites.dart";
+
 import 'Shift.dart';
 
 class ShiftsData with ChangeNotifier {
   List<Shift> shiftsList = [];
   List<Shift> shiftsBySite = [];
   Future futureListener;
-  List<CompanySites> companySitesProv = [];
-  Map<int, List<ShiftsSites>> sitess = {};
+
   InheritDefault inherit=InheritDefault();
-  // Future<void> getCompanySites(int companyID, String userToken) async {
-  //   print("GETTING COMPANY SITES NEWWW");
-  //   String url = "https://attendanceback.tamauze.com/api/Company/$companyID";
-  //   try {
-  //     companySitesProv = [];
-  //     final response = await http.get(
-  //       url,
-  //       headers: {
-  //         "Accept": "application/json",
-  //         'Authorization': "Bearer $userToken"
-  //       },
-  //     );
-  //     var decodedRes = json.decode(response.body);
-  //     if (jsonDecode(response.body)["message"] == "Success") {
-  //       var jsonObj = await jsonDecode(response.body)["data"] as List;
-  //       companySitesProv = jsonObj
-  //           .map((categoires) => CompanySites.fromJson(categoires))
-  //           .toList();
-
-  //       for (int i = 0; i < companySitesProv.length; i++) {
-  //         for (int k = 0; k < companySitesProv[i].shiftsList.length; k++) {
-  //           print(companySitesProv[i].shiftsList.length);
-  //           sitess.addAll(
-  //               {companySitesProv[i].siteID: companySitesProv[k].shiftsList});
-  //         }
-  //       }
-  //       print(sitess.length);
-  //       print(sitess.keys);
-  //       print(sitess.values);
-  //       print(sitess[4].length);
-
-  //       // print(companySitesProv[0].shiftsList.length);
-  //       // print(companySitesProv[0].shiftsList[1].shiftName);
-
-  //       // print(companySitesProv.length);
-  //       // print(companySitesProv[0].siteName);
-  //       // print("shhift id ${companySitesProv[0].shiftsList[0].shifID}");
-
-  //       notifyListeners();
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
 
   findMatchingShifts(int siteId, bool notInit, bool addallshiftsBool) {
     print("findMatchingShifts : $siteId");
@@ -90,10 +45,7 @@ class ShiftsData with ChangeNotifier {
             siteID: 0)
       ];
     }
-    // if (notInit) {
-    //   notifyListeners();
-    // }
-
+   
     return shiftsBySite.length;
   }
 
@@ -159,11 +111,11 @@ class ShiftsData with ChangeNotifier {
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        print('connected');
+   
         return true;
       }
     } on SocketException catch (_) {
-      print('not connected');
+    
       return false;
     }
     return false;
@@ -350,3 +302,47 @@ class ShiftsData with ChangeNotifier {
     }
   }
 }
+  // Future<void> getCompanySites(int companyID, String userToken) async {
+  //   print("GETTING COMPANY SITES NEWWW");
+  //   String url = "https://attendanceback.tamauze.com/api/Company/$companyID";
+  //   try {
+  //     companySitesProv = [];
+  //     final response = await http.get(
+  //       url,
+  //       headers: {
+  //         "Accept": "application/json",
+  //         'Authorization': "Bearer $userToken"
+  //       },
+  //     );
+  //     var decodedRes = json.decode(response.body);
+  //     if (jsonDecode(response.body)["message"] == "Success") {
+  //       var jsonObj = await jsonDecode(response.body)["data"] as List;
+  //       companySitesProv = jsonObj
+  //           .map((categoires) => CompanySites.fromJson(categoires))
+  //           .toList();
+
+  //       for (int i = 0; i < companySitesProv.length; i++) {
+  //         for (int k = 0; k < companySitesProv[i].shiftsList.length; k++) {
+  //           print(companySitesProv[i].shiftsList.length);
+  //           sitess.addAll(
+  //               {companySitesProv[i].siteID: companySitesProv[k].shiftsList});
+  //         }
+  //       }
+  //       print(sitess.length);
+  //       print(sitess.keys);
+  //       print(sitess.values);
+  //       print(sitess[4].length);
+
+  //       // print(companySitesProv[0].shiftsList.length);
+  //       // print(companySitesProv[0].shiftsList[1].shiftName);
+
+  //       // print(companySitesProv.length);
+  //       // print(companySitesProv[0].siteName);
+  //       // print("shhift id ${companySitesProv[0].shiftsList[0].shifID}");
+
+  //       notifyListeners();
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }

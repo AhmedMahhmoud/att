@@ -36,7 +36,7 @@ class RoundedSearchBar extends StatelessWidget {
   final String dropdownValue;
   final List<Site> list;
   final textController;
-  List<String> monawbat = ["كل المناوبات", "TDS"];
+
   RoundedSearchBar(
       {this.searchFun,
       this.dropdownFun,

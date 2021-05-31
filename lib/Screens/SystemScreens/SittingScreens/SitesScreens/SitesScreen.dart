@@ -98,14 +98,7 @@ class _SitesScreenState extends State<SitesScreen> {
                             "دليل المواقع"),
                       ),
 
-                      ///Title
-                      // DirectoriesHeader(
-                      //     ClipRRect(
-                      //       borderRadius: BorderRadius.circular(60.0),
-                      //       child: Lottie.asset("resources/locaitonss.json",
-                      //           repeat: false),
-                      //     ),
-                      //     "دليل المواقع"),
+         
 
                       ///List OF SITES
 
@@ -363,9 +356,7 @@ class _SitesScreenState extends State<SitesScreen> {
             ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-          floatingActionButton: InkWell(
-            onTap: () {
-              Navigator.push(
+          floatingActionButton: FloatingActionButton(elevation: 3,tooltip: "اضافة موقع",backgroundColor: Colors.transparent,onPressed: (){     Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => AddLocationMapScreen(
@@ -375,23 +366,17 @@ class _SitesScreenState extends State<SitesScreen> {
                           name: "",
                         ),
                         0)),
-              );
-            },
-            child: Container(
-              width: 60.w,
-              height: 60.h,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: Colors.orange),
-              child: Center(
-                  child: Icon(
-                Icons.add_location_alt,
-                size: ScreenUtil().setSp(30, allowFontScalingSelf: true),
-              )),
-            ),
-          ),
-        ),
-      );
+              );},child:Container(
+       
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(50),
+                color: Colors.orange[600]),
+            child: Center(
+                child: Icon(
+              Icons.add_location_alt,color: Colors.black,
+              size: ScreenUtil().setSp(30, allowFontScalingSelf: true),
+            )), ),
+      )));
     });
   }
 

@@ -15,8 +15,7 @@ import 'package:qr_users/services/permissions_data.dart';
 import 'package:qr_users/services/report_data.dart';
 import 'package:qr_users/services/user_data.dart';
 import "./Screens/SystemScreens/SittingScreens/MembersScreens/ContactDataProv.dart";
-import 'Screens/intro.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 
 import 'enums/connectivity_status.dart';
 
@@ -64,9 +63,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => PermissionHan(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => ContactService(),
-        ),
+
       ],
       child: ScreenUtilInit(
         designSize: Size(392.72, 807.27),

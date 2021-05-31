@@ -35,7 +35,7 @@ class DailyReportScreen extends StatefulWidget {
 class _DailyReportScreenState extends State<DailyReportScreen> {
   @override
   void initState() {
-    // TODO: implement initState
+
     super.initState();
     date = apiFormatter.format(DateTime.now());
     getData(siteId, date);
@@ -44,7 +44,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
     today = DateTime(now.year, now.month, now.day);
     selectedDate = DateTime(now.year, now.month, now.day);
   }
-
+  int siteId = 0;
   Site siteData;
   final DateFormat apiFormatter = DateFormat('yyyy-MM-dd');
   String date;
@@ -62,7 +62,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
       siteID = userProvider.user.userSiteId;
       siteData = await Provider.of<SiteData>(context, listen: false)
           .getSpecificSite(siteID, userProvider.user.userToken,context);
-    } else {
+    } else {  
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
@@ -71,6 +71,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
           siteID = Provider.of<SiteData>(context, listen: false)
               .sitesList[siteIndex]
               .id;
+              print("SiteIndex $siteIndex");
         });
       } else {
         siteID = Provider.of<SiteData>(context, listen: false)
@@ -82,7 +83,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
         .getDailyReportUnits(userProvider.user.userToken, siteID, date,context);
   }
 
-  int getSiteId(String siteName) {
+  int getSiteIndex(String siteName) {
     var list = Provider.of<SiteData>(context, listen: false).sitesList;
     int index = list.length;
     for (int i = 0; i < index; i++) {
@@ -103,7 +104,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
     }
   }
 
-  int siteId = 0;
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([]);
@@ -140,8 +141,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                             ),
                             Container(
                                 child: FutureBuilder(
-                                    future: Provider.of<ReportsData>(context,
-                                            listen: true)
+                                    future: reportsData
                                         .futureListener,
                                     builder: (context, snapshot) {
                                       switch (snapshot.connectionState) {
@@ -186,7 +186,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                       Expanded(
                         child: FutureBuilder(
                             future:
-                                Provider.of<ReportsData>(context, listen: true)
+                             reportsData
                                     .futureListener,
                             builder: (context, snapshot) {
                               switch (snapshot.connectionState) {
@@ -227,7 +227,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                                               ? Row(
                                                   children: [
                                                     Expanded(
-                                                      flex: 14,
+                                                      flex: 11,
                                                       child: SiteDropdown(
                                                         edit: true,
                                                         list: Provider.of<
@@ -242,16 +242,15 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                                                         hintColor: Colors.black,
                                                         onChange:
                                                             (value) async {
-                                                          // print()
                                                           var lastRec = siteId;
                                                           siteId =
-                                                              getSiteId(value);
+                                                              getSiteIndex(value);
                                                           if (lastRec !=
                                                               siteId) {
                                                             setState(() {});
                                                             getData(
                                                                 siteId, date);
-                                                            print(value);
+                                                            print("call back value $value");
                                                           }
                                                         },
                                                         selectedvalue: Provider
@@ -267,7 +266,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                                                       width: 5.w,
                                                     ),
                                                     Expanded(
-                                                      flex: 9,
+                                                      flex: 7,
                                                       child: Container(
                                                         child: Directionality(
                                                           textDirection: ui
@@ -283,8 +282,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
 
                                                                 onChanged:
                                                                     (value) {
-                                                                  if (value !=
-                                                                      date) {
+                                                                 
                                                                     if (value !=
                                                                         date) {
                                                                       date =
@@ -303,7 +301,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
 
                                                                     print(
                                                                         value);
-                                                                  }
+                                                                  
                                                                 },
                                                                 type:
                                                                     DateTimePickerType
@@ -373,7 +371,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                                                     initialValue:
                                                         selectedDateString,
                                                     onChanged: (value) {
-                                                      if (value != date) {
+                                          
                                                         if (value != date) {
                                                           date = value;
                                                           selectedDateString =
@@ -385,7 +383,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                                                             DateTime.parse(
                                                                 selectedDateString);
                                                         print(value);
-                                                      }
+                                                      
                                                     },
                                                     type:
                                                         DateTimePickerType.date,
@@ -649,24 +647,19 @@ class _DataTableRowState extends State<DataTableRow> {
                   }
                 });
               },
+              //USERNAME IN LISTVIEW//
               child: Container(
                 width: 160.w,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 30.h,
-                      child: AutoSizeText(
-                        widget.attendUnit.userName,
-                        maxLines: 1,
-                        style: TextStyle(
-                            fontSize: ScreenUtil()
-                                .setSp(16, allowFontScalingSelf: true),
-                            color: Colors.black),
-                      ),
-                    ),
-                  ],
+                child: Container(
+                  height: 30.h,
+                  child: AutoSizeText(
+                    widget.attendUnit.userName,
+                    maxLines: 1,
+                    style: TextStyle(
+                        fontSize: ScreenUtil()
+                            .setSp(16, allowFontScalingSelf: true),
+                        color: Colors.black),
+                  ),
                 ),
               ),
             ),
@@ -803,21 +796,7 @@ class _DataTableRowState extends State<DataTableRow> {
                         if (widget.attendUnit.attendType == 1) {
                           showAttendByCameraDetails();
                         } else {
-//                          Fluttertoast.showToast(
-//                              msg:
-//                              "تسجيل ",
-//                              toastLength: Toast
-//                                  .LENGTH_SHORT,
-//                              // // gravity:
-//                              // //     ToastGravity
-//                              //         .CENTER,
-//                              timeInSecForIosWeb:
-//                              1,
-//                              backgroundColor:
-//                              Colors.black,
-//                              textColor:
-//                              Colors.orange,
-//                              fontSize: 16.0);
+print("mob");
                         }
                       },
                       child: widget.attendUnit.timeOut != "-" ||
@@ -1186,67 +1165,14 @@ class DataTableHeader extends StatelessWidget {
               Expanded(
                 child: Row(
                   children: [
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                          height: 50.h,
-                          child: Center(
-                              child: Container(
-                            height: 20,
-                            child: AutoSizeText(
-                              'التأخير',
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: ScreenUtil()
-                                      .setSp(16, allowFontScalingSelf: true),
-                                  color: Colors.black),
-                            ),
-                          ))),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                          height: 50.h,
-                          child: Center(
-                              child: Container(
-                            height: 20,
-                            child: AutoSizeText(
-                              'حضور',
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: ScreenUtil()
-                                      .setSp(16, allowFontScalingSelf: true),
-                                  color: Colors.black),
-                            ),
-                          ))),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                          height: 50.h,
-                          child: Center(
-                              child: Container(
-                            height: 20,
-                            child: AutoSizeText(
-                              'انصراف',
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: ScreenUtil()
-                                      .setSp(16, allowFontScalingSelf: true),
-                                  color: Colors.black),
-                            ),
-                          ))),
-                    ),
+                    DataTableHeaderTitles("التأخير"),
+                  DataTableHeaderTitles("حضور"),
+              DataTableHeaderTitles("انصراف"),
                     Expanded(
                       flex: 1,
                       child: Container(
                           height: 50.h,
-                          child: Center(
-                            child: Container(),
-                          )),
+                       ),
                     ),
                   ],
                 ),
@@ -1254,5 +1180,31 @@ class DataTableHeader extends StatelessWidget {
             ],
           ),
         ));
+  }
+}
+
+class DataTableHeaderTitles extends StatelessWidget {
+ final String title;
+DataTableHeaderTitles(this.title);
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 3,
+      child: Container(
+          height: 50.h,
+          child: Center(
+              child: Container(
+            height: 20,
+            child: AutoSizeText(
+         title   ,
+              maxLines: 1,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: ScreenUtil()
+                      .setSp(16, allowFontScalingSelf: true),
+                  color: Colors.black),
+            ),
+          ))),
+    );
   }
 }

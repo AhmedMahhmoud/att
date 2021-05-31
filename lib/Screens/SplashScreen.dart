@@ -29,7 +29,7 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   bool isLoading = false;
 
-  Future checkSharedUserData() async {
+  Future  checkSharedUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> userData = (prefs.getStringList('userData') ?? null);
     print(userData);
@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
       print('null');
       await reverse("", 1);
     } else {
-      print('not null');
+  
       var value = await login(userName: userData[0], password: userData[1]);
       print('not null------$value');
       reverse(userData[0], value);
@@ -61,8 +61,6 @@ class _SplashScreenState extends State<SplashScreen>
     if (cachedUserData == null || cachedUserData.isEmpty) {
       print('null');
 
-      // Navigator.of(context).pushReplacement(
-      //     new MaterialPageRoute(builder: (context) => PageIntro()));
     } else {
       print('not null');
       print(cachedUserData[4]);
@@ -90,8 +88,8 @@ var userData=Provider.of<UserData>(context,listen: false);
                 ));
           } else {
             if (value > 0) {
-              print(value);
-              print("aa");
+              print(" usertype $value");
+          
 
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) {

@@ -32,8 +32,10 @@ class _ScanPageState extends State<ScanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        children: <Widget>[
-          Expanded(child: _buildQrView(context)),
+        children: <Widget>[     
+          Expanded(child: _buildQrView(context)),  InkWell(onTap: ()=>Navigator.pop(context),child: Container(color: Colors.orange,child: Icon(Icons.arrow_back),height: 50.h,width: MediaQuery.of(context).size.width,))
+          
+   
         ],
       ),
     );

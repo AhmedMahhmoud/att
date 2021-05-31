@@ -437,14 +437,7 @@ class _UserAttendanceReportScreenState
                                             child: searchTextField =
                                                 AutoCompleteTextField<Member>(
                                               key: key,
-                                              // onFocusChanged: (_) {
-                                              //   setState(() {
-                                              //     reportsData
-                                              //             .userAttendanceReport =
-                                              //         new UserAttendanceReport(
-                                              //             [], 0, 0, "");
-                                              //   });
-                                              // },
+                                       
                                               clearOnSubmit: false,
                                               controller: _nameController,
                                               suggestions:

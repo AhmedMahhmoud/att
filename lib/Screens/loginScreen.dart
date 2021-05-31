@@ -6,7 +6,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_users/Screens/ChangePasswordScreen.dart';
 import 'package:qr_users/Screens/HomePage.dart';
-import 'package:qr_users/Screens/SystemScreens/NavSceen.dart';
 import 'package:qr_users/Screens/SystemScreens/SystemGateScreens/NavScreenPartTwo.dart';
 import 'package:qr_users/Screens/SystemScreens/forgetScreen.dart';
 import 'package:qr_users/constants.dart';
@@ -17,7 +16,6 @@ import 'package:qr_users/widgets/roundedAlert.dart';
 import 'package:qr_users/widgets/roundedButton.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'intro.dart';
 
 class LoginScreen extends StatefulWidget {
   @override

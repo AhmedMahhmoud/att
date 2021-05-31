@@ -90,7 +90,7 @@ notifyListeners();
             });
 
         var decodedRes = json.decode(response.body);
-        print(response.body);
+        
         print("token is :${decodedRes["token"]}");
         if (decodedRes["message"] == "Success : ") {
           user.userToken = decodedRes["token"];
@@ -119,8 +119,7 @@ notifyListeners();
           if (msg == "Success") {
             print("login -------------- ${user.userSiteId} ");
             print("changedPassword -------------- $changedPassword ");
-            // await Provider.of<ShiftsData>(context, listen: false)
-            //     .getCompanySites(companyId, decodedRes["token"]);
+         
             SharedPreferences prefs = await SharedPreferences.getInstance();
             String comImageFilePath = await _fileFromImageUrl(
                 "$baseURL/${decodedRes["companyData"]["logo"]}", "CompanyLogo");
@@ -128,7 +127,7 @@ notifyListeners();
                 "$baseURL/${decodedRes["userData"]["userImage"]}", "userImage");
 
             print(comImageFilePath);
-
+     print(userImage);
             List<String> userData = [
               user.name,
               user.userJob,

@@ -132,7 +132,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
+
     super.initState();
     var comProvider = Provider.of<CompanyData>(context, listen: false).com;
     _emailController.text = comProvider.email;

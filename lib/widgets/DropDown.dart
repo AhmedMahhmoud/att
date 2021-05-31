@@ -62,7 +62,7 @@ class _SiteDropdownState extends State<SiteDropdown> {
                             child: Padding(
                               padding: const EdgeInsets.only(right: 5),
                               child: Container(
-                                height: 20,
+                                height: 20.h,
                                 child: AutoSizeText(
                                   x.name,
                                   maxLines: 1,
