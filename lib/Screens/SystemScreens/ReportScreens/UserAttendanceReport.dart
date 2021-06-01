@@ -96,14 +96,14 @@ class _UserAttendanceReportScreenState
     if (userProvider.user.userType == 2) {
       siteId = userProvider.user.userSiteId;
       siteData = await Provider.of<SiteData>(context, listen: false)
-          .getSpecificSite(siteId, userProvider.user.userToken,context);
+          .getSpecificSite(siteId, userProvider.user.userToken, context);
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
+          .getAllSiteMembers(siteId, userProvider.user.userToken, context);
     } else {
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
-                comProvider.com.id, userProvider.user.userToken,context)
+                comProvider.com.id, userProvider.user.userToken, context)
             .then((value) async {
           print("Got Sites");
         });
@@ -111,7 +111,7 @@ class _UserAttendanceReportScreenState
       siteId = Provider.of<SiteData>(context, listen: false).sitesList[0].id;
 
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
+          .getAllSiteMembers(siteId, userProvider.user.userToken, context);
     }
   }
 
@@ -138,6 +138,7 @@ class _UserAttendanceReportScreenState
         return WillPopScope(
           onWillPop: onWillPop,
           child: Scaffold(
+            resizeToAvoidBottomInset: true,
             backgroundColor: Colors.white,
             body: Container(
               child: GestureDetector(
@@ -315,7 +316,8 @@ class _UserAttendanceReportScreenState
                                                                     userToken,
                                                                     selectedId,
                                                                     dateFromString,
-                                                                    dateToString,context);
+                                                                    dateToString,
+                                                                    context);
                                                           }
                                                         }
                                                       },
@@ -414,7 +416,8 @@ class _UserAttendanceReportScreenState
                                                                       listen:
                                                                           false)
                                                                   .user
-                                                                  .userToken,context);
+                                                                  .userToken,
+                                                              context);
                                                       setState(() {});
                                                     }
                                                     print(value);
@@ -437,7 +440,6 @@ class _UserAttendanceReportScreenState
                                             child: searchTextField =
                                                 AutoCompleteTextField<Member>(
                                               key: key,
-                                       
                                               clearOnSubmit: false,
                                               controller: _nameController,
                                               suggestions:
@@ -501,7 +503,8 @@ class _UserAttendanceReportScreenState
                                                           userToken,
                                                           item.id,
                                                           dateFromString,
-                                                          dateToString,context);
+                                                          dateToString,
+                                                          context);
                                                 }
                                               },
                                               itemBuilder: (context, item) {
