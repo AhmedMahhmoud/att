@@ -37,7 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     var comProvider = Provider.of<CompanyData>(context, listen: false);
 
     await Provider.of<DaysOffData>(context, listen: false)
-        .getDaysOff(comProvider.com.id, userProvider.user.userToken,context);
+        .getDaysOff(comProvider.com.id, userProvider.user.userToken, context);
   }
 
   @override
@@ -146,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   await Provider.of<SiteData>(context,
                                           listen: false)
                                       .getSitesByCompanyId(comProvier.com.id,
-                                          userProvider.user.userToken,context)
+                                          userProvider.user.userToken, context)
                                       .then((value) async {
                                     print("Got Sites");
                                   });
@@ -161,7 +161,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                     listen: false)
                                                 .dropDownSitesIndex]
                                             .id,
-                                        true,
                                         false);
                                 Provider.of<SiteData>(context, listen: false)
                                     .fillCurrentShiftID(Provider.of<ShiftsData>(
@@ -340,7 +339,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         context,
                                         listen: false)
                                     .editDaysOffApi(comProvider.com.id,
-                                        userProvider.user.userToken,context);
+                                        userProvider.user.userToken, context);
                                 if (msg == "Success") {
                                   Fluttertoast.showToast(
                                       msg: "تم التعديل بنجاح",

@@ -14,9 +14,6 @@ import 'package:qr_users/widgets/headers.dart';
 import 'package:qr_users/widgets/roundedButton.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
-
-
 var cron1;
 var cron2;
 
@@ -26,54 +23,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
-  
   DateTime currentBackPressTime;
   @override
   Widget build(BuildContext context) {
     final userDataProvider = Provider.of<UserData>(context, listen: false);
-    print(userDataProvider.user.userType);Future<Position> _determinePosition() async {
-bool serviceEnabled;
-LocationPermission permission;
-
-serviceEnabled = await Geolocator.isLocationServiceEnabled();
-if (!serviceEnabled) {
-  return Future.error('Location services are disabled.');
-}
-
-permission = await Geolocator.checkPermission();
-if (permission == LocationPermission.deniedForever) {
-  return Future.error(
-      'Location permissions are permanently denied, we cannot request permissions.');
-}
-
-if (permission == LocationPermission.denied) {
-  permission = await Geolocator.requestPermission();
-  if (permission != LocationPermission.whileInUse &&
-      permission != LocationPermission.always) {
-    return Future.error(
-        'Location permissions are denied (actual value: $permission).');
-  }
-}
-return await Geolocator.getCurrentPosition(
-    desiredAccuracy: LocationAccuracy.high);
-}
     SystemChrome.setEnabledSystemUIOverlays([]);
     return WillPopScope(
         onWillPop: onWillPop,
         child: GestureDetector(
-          onTap: () async {
-await _determinePosition().then((value) {
-  if (value.isMocked)
-  {
-    print ("yes it is mocked");
-  }
-  else {
-    print("not it is not mocked");
-  }
-});
-
-          },
+          onTap: () async {},
           child: Scaffold(
             backgroundColor: Colors.white,
             drawer: userDataProvider.user.userType == 0 ? DrawerI() : null,

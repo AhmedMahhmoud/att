@@ -50,7 +50,7 @@ class _SitesScreenState extends State<SitesScreen> {
     print("refresh");
     // if failed,use refreshFailed()
     await Provider.of<SiteData>(context, listen: false).getSitesByCompanyId(
-        companyProvider.com.id, userProvider.user.userToken,context);
+        companyProvider.com.id, userProvider.user.userToken, context);
   }
 
   getData() async {
@@ -59,12 +59,12 @@ class _SitesScreenState extends State<SitesScreen> {
 
     if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
       await Provider.of<SiteData>(context, listen: false).getSitesByCompanyId(
-          companyProvider.com.id, userProvider.user.userToken,context);
+          companyProvider.com.id, userProvider.user.userToken, context);
     }
     if (Provider.of<ShiftsData>(context, listen: false).shiftsList.isEmpty) {
       await Provider.of<ShiftsData>(context, listen: false)
           .getAllCompanyShifts(
-              companyProvider.com.id, userProvider.user.userToken,context)
+              companyProvider.com.id, userProvider.user.userToken, context)
           .then((value) async {
         print("got Shifts");
       });
@@ -78,305 +78,329 @@ class _SitesScreenState extends State<SitesScreen> {
 
     return Consumer<SiteData>(builder: (context, siteData, child) {
       return WillPopScope(
-        onWillPop: onWillPop,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Container(
-            child: Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 15),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Header(nav: false),
-                      Directionality(
-                        textDirection: ui.TextDirection.rtl,
-                        child: SmallDirectoriesHeader(
-                            Lottie.asset("resources/locaitonss.json",
-                                repeat: false),
-                            "دليل المواقع"),
-                      ),
+          onWillPop: onWillPop,
+          child: Scaffold(
+              backgroundColor: Colors.white,
+              body: Container(
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Header(nav: false),
+                          Directionality(
+                            textDirection: ui.TextDirection.rtl,
+                            child: SmallDirectoriesHeader(
+                                Lottie.asset("resources/locaitonss.json",
+                                    repeat: false),
+                                "دليل المواقع"),
+                          ),
 
-         
+                          ///List OF SITES
 
-                      ///List OF SITES
-
-                      Expanded(
-                        child: FutureBuilder(
-                            future: siteData.futureListener,
-                            builder: (context, snapshot) {
-                              switch (snapshot.connectionState) {
-                                case ConnectionState.waiting:
-                                  return Container(
-                                    color: Colors.white,
-                                    child: Center(
-                                      child: Platform.isIOS
-                                          ? CupertinoActivityIndicator(
-                                              radius: 20,
-                                            )
-                                          : CircularProgressIndicator(
-                                              backgroundColor: Colors.white,
-                                              valueColor:
-                                                  new AlwaysStoppedAnimation<
-                                                      Color>(Colors.orange),
-                                            ),
-                                    ),
-                                  );
-                                case ConnectionState.done:
-                                  return SmartRefresher(
-                                    onRefresh: _onRefresh,
-                                    controller: refreshController,
-                                    enablePullDown: true,
-                                    header: WaterDropMaterialHeader(
-                                      color: Colors.white,
-                                      backgroundColor: Colors.orange,
-                                    ),
-                                    child: ListView.builder(
-                                        itemCount: siteData.sitesList.length,
-                                        itemBuilder:
-                                            (BuildContext context, int index) {
-                                          return LocationTile(
-                                            index: index,
-                                            site: siteData.sitesList[index],
-                                            title:
-                                                siteData.sitesList[index].name,
-                                            onTapDelete: () {
-                                              var token = Provider.of<UserData>(
-                                                      context,
-                                                      listen: false)
-                                                  .user
-                                                  .userToken;
-                                              return showDialog(
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return RoundedAlert(
-                                                        onPressed: () async {
-                                                          showDialog(
-                                                              barrierDismissible:
-                                                                  false,
-                                                              context: context,
-                                                              builder:
-                                                                  (BuildContext
-                                                                      context) {
-                                                                return RoundedLoadingIndicator();
-                                                              });
-                                                          var msg = await siteData
-                                                              .deleteSite(
-                                                                  siteData
-                                                                      .sitesList[
-                                                                          index]
-                                                                      .id,
-                                                                  token,
-                                                                  index,context);
-                                                          if (msg ==
-                                                              "Success") {
-                                                            Navigator.pop(
-                                                                context);
-                                                            Fluttertoast.showToast(
-                                                                msg:
-                                                                    "تم الحذف بنجاح",
-                                                                toastLength: Toast
-                                                                    .LENGTH_SHORT,
-                                                                gravity:
-                                                                    ToastGravity
-                                                                        .CENTER,
-                                                                timeInSecForIosWeb:
-                                                                    1,
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .green,
-                                                                textColor:
-                                                                    Colors
-                                                                        .white,
-                                                                fontSize: ScreenUtil().setSp(
-                                                                    16,
-                                                                    allowFontScalingSelf:
-                                                                        true));
-                                                          } else if (msg ==
-                                                              "hasData") {
-                                                            Fluttertoast.showToast(
-                                                                msg:
-                                                                    "خطأ في الحذف: هذا الموقع يحتوي على مناوبات\nبرجاء حذف المناوبات اولا.",
-                                                                toastLength: Toast
-                                                                    .LENGTH_SHORT,
-                                                                gravity:
-                                                                    ToastGravity
-                                                                        .CENTER,
-                                                                timeInSecForIosWeb:
-                                                                    1,
-                                                                backgroundColor:
-                                                                    Colors.red,
-                                                                textColor:
-                                                                    Colors
-                                                                        .black,
-                                                                fontSize: ScreenUtil().setSp(
-                                                                    16,
-                                                                    allowFontScalingSelf:
-                                                                        true));
-                                                          } else if (msg ==
-                                                              "failed") {
-                                                            Fluttertoast.showToast(
-                                                                msg:
-                                                                    "خطأ في اثناء الحذف.",
-                                                                toastLength: Toast
-                                                                    .LENGTH_SHORT,
-                                                                gravity:
-                                                                    ToastGravity
-                                                                        .CENTER,
-                                                                timeInSecForIosWeb:
-                                                                    1,
-                                                                backgroundColor:
-                                                                    Colors.red,
-                                                                textColor:
-                                                                    Colors
-                                                                        .black,
-                                                                fontSize: ScreenUtil().setSp(
-                                                                    16,
-                                                                    allowFontScalingSelf:
-                                                                        true));
-                                                          } else if (msg ==
-                                                              "noInternet") {
-                                                            Fluttertoast.showToast(
-                                                                msg:
-                                                                    "خطأ في الحذف: لا يوجد اتصال بالانترنت.",
-                                                                toastLength: Toast
-                                                                    .LENGTH_SHORT,
-                                                                gravity:
-                                                                    ToastGravity
-                                                                        .CENTER,
-                                                                timeInSecForIosWeb:
-                                                                    1,
-                                                                backgroundColor:
-                                                                    Colors.red,
-                                                                textColor:
-                                                                    Colors
-                                                                        .black,
-                                                                fontSize: ScreenUtil().setSp(
-                                                                    16,
-                                                                    allowFontScalingSelf:
-                                                                        true));
-                                                          } else {
-                                                            Fluttertoast.showToast(
-                                                                msg:
-                                                                    "خطأ في الحذف.",
-                                                                toastLength: Toast
-                                                                    .LENGTH_SHORT,
-                                                                gravity:
-                                                                    ToastGravity
-                                                                        .CENTER,
-                                                                timeInSecForIosWeb:
-                                                                    1,
-                                                                backgroundColor:
-                                                                    Colors.red,
-                                                                textColor:
-                                                                    Colors
-                                                                        .black,
-                                                                fontSize: ScreenUtil().setSp(
-                                                                    16,
-                                                                    allowFontScalingSelf:
-                                                                        true));
-                                                          }
-                                                          Navigator.pop(
-                                                              context);
-                                                          Navigator.pop(
-                                                              context);
-                                                        },
-                                                        title: 'إزالة موقع',
-                                                        content:
-                                                            "هل تريد إزالة${siteData.sitesList[index].name} ؟");
-                                                  });
-                                            },
-                                            onTapEdit: () {
-                                              Navigator.of(context).push(
-                                                new MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      AddSiteScreen(
-                                                          siteData
-                                                              .sitesList[index],
-                                                          index,
-                                                          true,
-                                                          false),
+                          Expanded(
+                            child: FutureBuilder(
+                                future: siteData.futureListener,
+                                builder: (context, snapshot) {
+                                  switch (snapshot.connectionState) {
+                                    case ConnectionState.waiting:
+                                      return Container(
+                                        color: Colors.white,
+                                        child: Center(
+                                          child: Platform.isIOS
+                                              ? CupertinoActivityIndicator(
+                                                  radius: 20,
+                                                )
+                                              : CircularProgressIndicator(
+                                                  backgroundColor: Colors.white,
+                                                  valueColor:
+                                                      new AlwaysStoppedAnimation<
+                                                          Color>(Colors.orange),
                                                 ),
+                                        ),
+                                      );
+                                    case ConnectionState.done:
+                                      return SmartRefresher(
+                                        onRefresh: _onRefresh,
+                                        controller: refreshController,
+                                        enablePullDown: true,
+                                        header: WaterDropMaterialHeader(
+                                          color: Colors.white,
+                                          backgroundColor: Colors.orange,
+                                        ),
+                                        child: ListView.builder(
+                                            itemCount:
+                                                siteData.sitesList.length,
+                                            itemBuilder: (BuildContext context,
+                                                int index) {
+                                              return LocationTile(
+                                                index: index,
+                                                site: siteData.sitesList[index],
+                                                title: siteData
+                                                    .sitesList[index].name,
+                                                onTapDelete: () {
+                                                  var token =
+                                                      Provider.of<UserData>(
+                                                              context,
+                                                              listen: false)
+                                                          .user
+                                                          .userToken;
+                                                  return showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return RoundedAlert(
+                                                            onPressed:
+                                                                () async {
+                                                              showDialog(
+                                                                  barrierDismissible:
+                                                                      false,
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return RoundedLoadingIndicator();
+                                                                  });
+                                                              var msg = await siteData
+                                                                  .deleteSite(
+                                                                      siteData
+                                                                          .sitesList[
+                                                                              index]
+                                                                          .id,
+                                                                      token,
+                                                                      index,
+                                                                      context);
+                                                              if (msg ==
+                                                                  "Success") {
+                                                                Navigator.pop(
+                                                                    context);
+                                                                Fluttertoast.showToast(
+                                                                    msg:
+                                                                        "تم الحذف بنجاح",
+                                                                    toastLength:
+                                                                        Toast
+                                                                            .LENGTH_SHORT,
+                                                                    gravity: ToastGravity
+                                                                        .CENTER,
+                                                                    timeInSecForIosWeb:
+                                                                        1,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .green,
+                                                                    textColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    fontSize:
+                                                                        ScreenUtil().setSp(
+                                                                            16,
+                                                                            allowFontScalingSelf:
+                                                                                true));
+                                                              } else if (msg ==
+                                                                  "hasData") {
+                                                                Fluttertoast.showToast(
+                                                                    msg:
+                                                                        "خطأ في الحذف: هذا الموقع يحتوي على مناوبات\nبرجاء حذف المناوبات اولا.",
+                                                                    toastLength:
+                                                                        Toast
+                                                                            .LENGTH_SHORT,
+                                                                    gravity: ToastGravity
+                                                                        .CENTER,
+                                                                    timeInSecForIosWeb:
+                                                                        1,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .red,
+                                                                    textColor:
+                                                                        Colors
+                                                                            .black,
+                                                                    fontSize:
+                                                                        ScreenUtil().setSp(
+                                                                            16,
+                                                                            allowFontScalingSelf:
+                                                                                true));
+                                                              } else if (msg ==
+                                                                  "failed") {
+                                                                Fluttertoast.showToast(
+                                                                    msg:
+                                                                        "خطأ في اثناء الحذف.",
+                                                                    toastLength:
+                                                                        Toast
+                                                                            .LENGTH_SHORT,
+                                                                    gravity: ToastGravity
+                                                                        .CENTER,
+                                                                    timeInSecForIosWeb:
+                                                                        1,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .red,
+                                                                    textColor:
+                                                                        Colors
+                                                                            .black,
+                                                                    fontSize:
+                                                                        ScreenUtil().setSp(
+                                                                            16,
+                                                                            allowFontScalingSelf:
+                                                                                true));
+                                                              } else if (msg ==
+                                                                  "noInternet") {
+                                                                Fluttertoast.showToast(
+                                                                    msg:
+                                                                        "خطأ في الحذف: لا يوجد اتصال بالانترنت.",
+                                                                    toastLength:
+                                                                        Toast
+                                                                            .LENGTH_SHORT,
+                                                                    gravity: ToastGravity
+                                                                        .CENTER,
+                                                                    timeInSecForIosWeb:
+                                                                        1,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .red,
+                                                                    textColor:
+                                                                        Colors
+                                                                            .black,
+                                                                    fontSize:
+                                                                        ScreenUtil().setSp(
+                                                                            16,
+                                                                            allowFontScalingSelf:
+                                                                                true));
+                                                              } else {
+                                                                Fluttertoast.showToast(
+                                                                    msg:
+                                                                        "خطأ في الحذف.",
+                                                                    toastLength:
+                                                                        Toast
+                                                                            .LENGTH_SHORT,
+                                                                    gravity: ToastGravity
+                                                                        .CENTER,
+                                                                    timeInSecForIosWeb:
+                                                                        1,
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .red,
+                                                                    textColor:
+                                                                        Colors
+                                                                            .black,
+                                                                    fontSize:
+                                                                        ScreenUtil().setSp(
+                                                                            16,
+                                                                            allowFontScalingSelf:
+                                                                                true));
+                                                              }
+                                                              Navigator.pop(
+                                                                  context);
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            title: 'إزالة موقع',
+                                                            content:
+                                                                "هل تريد إزالة${siteData.sitesList[index].name} ؟");
+                                                      });
+                                                },
+                                                onTapEdit: () {
+                                                  Navigator.of(context).push(
+                                                    new MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          AddSiteScreen(
+                                                              siteData.sitesList[
+                                                                  index],
+                                                              index,
+                                                              true,
+                                                              false),
+                                                    ),
+                                                  );
+                                                },
+                                                onTapLocation: () {
+                                                  Navigator.of(context).push(
+                                                    new MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          ShowLocationMap(
+                                                              siteData
+                                                                  .sitesList[
+                                                                      index]
+                                                                  .lat,
+                                                              siteData
+                                                                  .sitesList[
+                                                                      index]
+                                                                  .long,
+                                                              siteData
+                                                                  .sitesList[
+                                                                      index]
+                                                                  .name),
+                                                    ),
+                                                  );
+                                                },
                                               );
-                                            },
-                                            onTapLocation: () {
-                                              Navigator.of(context).push(
-                                                new MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ShowLocationMap(
-                                                          siteData
-                                                              .sitesList[index]
-                                                              .lat,
-                                                          siteData
-                                                              .sitesList[index]
-                                                              .long,
-                                                          siteData
-                                                              .sitesList[index]
-                                                              .name),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        }),
-                                  );
-                                default:
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      backgroundColor: Colors.white,
-                                      valueColor:
-                                          new AlwaysStoppedAnimation<Color>(
-                                              Colors.orange),
-                                    ),
-                                  );
-                              }
-                            }),
+                                            }),
+                                      );
+                                    default:
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          backgroundColor: Colors.white,
+                                          valueColor:
+                                              new AlwaysStoppedAnimation<Color>(
+                                                  Colors.orange),
+                                        ),
+                                      );
+                                  }
+                                }),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  left: 5.0.w,
-                  top: 5.0.h,
-                  child: Container(
-                    width: 50.w,
-                    height: 50.h,
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => NavScreenTwo(3)),
-                            (Route<dynamic> route) => false);
-                      },
                     ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-          floatingActionButton: FloatingActionButton(elevation: 3,tooltip: "اضافة موقع",backgroundColor: Colors.transparent,onPressed: (){     Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => AddLocationMapScreen(
-                        Site(
-                          lat: 0.0,
-                          long: 0.0,
-                          name: "",
+                    Positioned(
+                      left: 5.0.w,
+                      top: 5.0.h,
+                      child: Container(
+                        width: 50.w,
+                        height: 50.h,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) => NavScreenTwo(3)),
+                                (Route<dynamic> route) => false);
+                          },
                         ),
-                        0)),
-              );},child:Container(
-       
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                color: Colors.orange[600]),
-            child: Center(
-                child: Icon(
-              Icons.add_location_alt,color: Colors.black,
-              size: ScreenUtil().setSp(30, allowFontScalingSelf: true),
-            )), ),
-      )));
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.startFloat,
+              floatingActionButton: FloatingActionButton(
+                elevation: 3,
+                tooltip: "اضافة موقع",
+                backgroundColor: Colors.transparent,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddLocationMapScreen(
+                            Site(
+                              lat: 0.0,
+                              long: 0.0,
+                              name: "",
+                            ),
+                            0)),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.orange[600]),
+                  child: Center(
+                      child: Icon(
+                    Icons.add_location_alt,
+                    color: Colors.black,
+                    size: ScreenUtil().setSp(30, allowFontScalingSelf: true),
+                  )),
+                ),
+              )));
     });
   }
 
@@ -549,7 +573,6 @@ class _LocationTileState extends State<LocationTile> {
                                               listen: false)
                                           .sitesList[widget.index]
                                           .id,
-                                      true,
                                       true);
                               print(Provider.of<ShiftsData>(context,
                                       listen: false)

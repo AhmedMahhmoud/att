@@ -22,12 +22,12 @@ class ErrorScreen2 extends StatelessWidget {
     }
     var userData = Provider.of<UserData>(context);
     return GestureDetector(
-      onTap: ()=>print( userData.cachedUserData.isNotEmpty),
+      onTap: () => print(userData.cachedUserData.isNotEmpty),
       child: Scaffold(
         drawer: DrawerI(),
         body: Column(
           children: [
-  NewHeader(userData.cachedUserData),
+            NewHeader(userData.cachedUserData),
             Expanded(
               child: Center(
                 child: Column(
@@ -59,10 +59,10 @@ class ErrorScreen2 extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          height: 20,
+                          height: 20.h,
                         ),
                         Container(
-                          height: 20,
+                          height: 20.h,
                           child: AutoSizeText(
                             "برجاء المحاولة مرة اخرى ",
                             maxLines: 1,

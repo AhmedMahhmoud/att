@@ -49,9 +49,9 @@ class UserData with ChangeNotifier {
 
   final _apiToken = 'ByYM000OLlMQG6VVVp1OH7Xzyr7gHuw1qvUC5dcGt3SNM';
   bool loggedIn = false;
-  Future<bool> isConnectedToInternet() async {
+  Future<bool> isConnectedToInternet(String url) async {
     try {
-      final result = await InternetAddress.lookup('google.com');
+      final result = await InternetAddress.lookup(url);
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('connected');
         return true;
@@ -81,7 +81,10 @@ class UserData with ChangeNotifier {
 
     if (connectivityResult != ConnectivityResult.none) {
       try {
-        var stability = await isConnectedToInternet();
+        if (await isConnectedToInternet("www.tamauzeds.com") == false) {
+          return -3;
+        }
+        var stability = await isConnectedToInternet("www.google.com");
         if (stability) {
           final response = await http.post("$baseURL/api/Authenticate/login",
               body: json.encode(
@@ -157,7 +160,7 @@ class UserData with ChangeNotifier {
   }
 
   Future<String> forgetPassword(String username, String email) async {
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       try {
         final response = await http.put("$baseURL/api/Users/ForgetPassword",
             body: json.encode(
@@ -188,7 +191,7 @@ class UserData with ChangeNotifier {
 
   Future<String> setPassword(
       {String pinCode, String username, String password}) async {
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       try {
         final response = await http.put("$baseURL/api/Users/NewPassword",
             body: json.encode(
@@ -226,7 +229,7 @@ class UserData with ChangeNotifier {
     print(image.lengthSync());
     String msg;
     print("uploading image......$cardCode...${cardCode.length}...");
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       int locationService = await getCurrentLocation();
       if (locationService == 0) {
         var stream = new http.ByteStream(Stream.castFrom(image.openRead()));
@@ -289,7 +292,7 @@ class UserData with ChangeNotifier {
   Future<String> attend({String qrCode}) async {
     print("attend --${user.userID}----$qrCode");
     String msg;
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       int locationService = await getCurrentLocation();
       if (locationService == 0) {
         String imei = await getDeviceUUID();
@@ -376,7 +379,7 @@ class UserData with ChangeNotifier {
     print(_image.lengthSync());
     var url = "";
 
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       await uploadImage(_image, user.id).then((value) async {
         if (value != "") {
           print("path :$value");
@@ -402,7 +405,7 @@ class UserData with ChangeNotifier {
 
   Future<String> editProfile(String password) async {
     print("${user.id} -----edit-- $password");
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       try {
         final response = await http.put("$baseURL/api/Users/UpdatePassword",
             body: json.encode(
@@ -435,7 +438,7 @@ class UserData with ChangeNotifier {
     String imei = await getDeviceUUID();
     print("${user.id} -----edit-- $password --- mac$imei ");
 
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       try {
         final response = await http.put("$baseURL/api/Users/UpdatePassword",
             body: json.encode(

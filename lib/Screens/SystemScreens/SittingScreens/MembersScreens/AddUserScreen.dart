@@ -68,7 +68,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
       print(Provider.of<SiteData>(context, listen: false).dropDownSitesIndex);
       Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
           Provider.of<SiteData>(context, listen: false).sitesList[siteId].id,
-          true,
           true);
     }
   }
@@ -95,8 +94,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
     if (widget.isEdit) {
       print("edit screen");
       edit = true;
-      await Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
-          getSiteIdByShiftId(widget.member.shiftId), false, true);
+      await Provider.of<ShiftsData>(context, listen: false)
+          .findMatchingShifts(getSiteIdByShiftId(widget.member.shiftId), true);
 
       shiftId = getShiftListIndex(widget.member.shiftId);
       siteId = getSiteListIndex(shiftId);
@@ -108,9 +107,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
       setState(() {});
     } else {
       await Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
-          Provider.of<SiteData>(context, listen: false).sitesList[0].id,
-          false,
-          true);
+          Provider.of<SiteData>(context, listen: false).sitesList[0].id, true);
     }
   }
 
@@ -561,7 +558,6 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                             listen: false)
                                                         .sitesList[siteId]
                                                         .id,
-                                                    true,
                                                     true);
                                             setState(() {
                                               shiftId = 0;
@@ -669,27 +665,31 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                 context,
                                                 listen: false)
                                             .addMember(
-                                          Member(
-                                              userType: userType,
-                                              shiftId: Provider.of<ShiftsData>(
-                                                      context,
-                                                      listen: false)
-                                                  .shiftsBySite[shiftId]
-                                                  .shiftId,
-                                              jobTitle:
-                                                  _titleController.text.trim(),
-                                              email:
-                                                  _emailController.text.trim(),
-                                              phoneNumber: number.dialCode +
-                                                  _phoneController.text
-                                                      .replaceAll(
-                                                    new RegExp(r"\s+\b|\b\s"),
-                                                    "",
-                                                  ),
-                                              name:
-                                                  _nameController.text.trim()),
-                                          token,context
-                                        );
+                                                Member(
+                                                    userType: userType,
+                                                    shiftId: Provider.of<
+                                                                ShiftsData>(
+                                                            context,
+                                                            listen: false)
+                                                        .shiftsBySite[shiftId]
+                                                        .shiftId,
+                                                    jobTitle: _titleController
+                                                        .text
+                                                        .trim(),
+                                                    email: _emailController.text
+                                                        .trim(),
+                                                    phoneNumber: number
+                                                            .dialCode +
+                                                        _phoneController.text
+                                                            .replaceAll(
+                                                          new RegExp(
+                                                              r"\s+\b|\b\s"),
+                                                          "",
+                                                        ),
+                                                    name: _nameController.text
+                                                        .trim()),
+                                                token,
+                                                context);
                                         Navigator.pop(context);
                                         if (msg == "Success") {
                                           Fluttertoast.showToast(
@@ -850,7 +850,8 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                                       name: _nameController
                                                                           .text),
                                                                   widget.id,
-                                                                  token,context);
+                                                                  token,
+                                                                  context);
 
                                                           if (msg ==
                                                               "Success") {

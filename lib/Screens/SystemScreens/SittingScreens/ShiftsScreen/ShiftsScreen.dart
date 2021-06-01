@@ -74,7 +74,8 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
       isLoading = true;
     });
     await Provider.of<ShiftsData>(context, listen: false)
-        .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken,context)
+        .getAllCompanyShifts(
+            comProvier.com.id, userProvider.user.userToken, context)
         .then((value) async {
       print("got Shifts");
     });
@@ -84,18 +85,13 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
 
     await Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
         Provider.of<SiteData>(context, listen: false).sitesList[siteId].id,
-        true,
         false);
     refreshController.refreshCompleted();
   }
 
   void didChangeDependencies() async {
-    // TODO: implement didChangeDependencies
     isLoading = false;
-    if (mounted) {
-      // Provider.of<SiteData>(context, listen: false).setCurrentSiteName(
-      //     Provider.of<SiteData>(context, listen: false).sitesList[siteId].name);
-    }
+    if (mounted) {}
 
     super.didChangeDependencies();
     await getData();
@@ -107,14 +103,16 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
 
     if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
       await Provider.of<SiteData>(context, listen: false)
-          .getSitesByCompanyId(comProvier.com.id, userProvider.user.userToken,context)
+          .getSitesByCompanyId(
+              comProvier.com.id, userProvider.user.userToken, context)
           .then((value) async {
         print("GOt Sites");
       });
     }
     if (Provider.of<ShiftsData>(context, listen: false).shiftsList.isEmpty) {
       await Provider.of<ShiftsData>(context, listen: false)
-          .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken,context)
+          .getAllCompanyShifts(
+              comProvier.com.id, userProvider.user.userToken, context)
           .then((value) async {
         print("got Shifts");
       });
@@ -122,10 +120,9 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
     await fillList();
   }
 
-  fillList() {
-    Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
+  fillList() async {
+    await Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
         Provider.of<SiteData>(context, listen: false).sitesList[siteId].id,
-        false,
         false);
   }
 
@@ -241,7 +238,6 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
                                                                 listen: false)
                                                             .sitesList[siteId]
                                                             .id,
-                                                        true,
                                                         false);
                                               },
                                               selectedvalue:
@@ -312,7 +308,7 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
                                                                                             builder: (BuildContext context) {
                                                                                               return RoundedLoadingIndicator();
                                                                                             });
-                                                                                        var msg = await shiftsData.deleteShift(shiftsData.shiftsBySite[index].shiftId, token, index,context);
+                                                                                        var msg = await shiftsData.deleteShift(shiftsData.shiftsBySite[index].shiftId, token, index, context);
 
                                                                                         if (msg == "Success") {
                                                                                           Navigator.pop(context);
@@ -495,105 +491,130 @@ class _ShiftTileState extends State<ShiftTile> {
   }
 
   Widget build(BuildContext context) {
+    var siteProv = Provider.of<SiteData>(context, listen: false);
+    var shiftProv = Provider.of<ShiftsData>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       child: InkWell(
         onTap: () {
           showShiftDetails();
         },
-        child: Card(
-            elevation: 3,
-            child: Directionality(
-              textDirection: ui.TextDirection.rtl,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: Container(
-                  width: double.infinity.w,
-                  height: 60.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_rounded,
-                              size: ScreenUtil()
-                                  .setSp(35, allowFontScalingSelf: true),
-                              color: Colors.orange,
+        child: widget.shift.shiftId == -100
+            ? Container()
+            : Card(
+                elevation: 3,
+                child: Directionality(
+                  textDirection: ui.TextDirection.rtl,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Container(
+                      width: double.infinity.w,
+                      height: 60.h,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today_rounded,
+                                  size: ScreenUtil()
+                                      .setSp(35, allowFontScalingSelf: true),
+                                  color: Colors.orange,
+                                ),
+                                SizedBox(
+                                  width: 20.w,
+                                ),
+                                Container(
+                                  height: 20,
+                                  child: AutoSizeText(
+                                    widget.shift.shiftName,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                        fontSize: ScreenUtil().setSp(16,
+                                            allowFontScalingSelf: true),
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(
-                              width: 20.w,
-                            ),
-                            Container(
-                              height: 20,
-                              child: AutoSizeText(
-                                widget.shift.shiftName,
-                                maxLines: 1,
-                                style: TextStyle(
-                                    fontSize: ScreenUtil()
-                                        .setSp(16, allowFontScalingSelf: true),
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      InkWell(
-                        onTap: () async {
-                          // await Provider.of<SiteData>(context, listen: false)
-                          //     .setDropDownShift(widget.index);
-                          Provider.of<SiteData>(context, listen: false)
-                              .setDropDownShift(widget.index);
-                          Provider.of<SiteData>(context, listen: false)
-                              .setSiteValue(widget.siteName);
-                          Provider.of<SiteData>(context, listen: false)
-                              .fillCurrentShiftID(Provider.of<ShiftsData>(
-                                      context,
-                                      listen: false)
-                                  .shiftsBySite[widget.index]
-                                  .shiftId);
+                          ),
+                          InkWell(
+                            onTap: () async {
+                              siteProv.setDropDownShift(widget.index);
+                              siteProv.setSiteValue(widget.siteName);
+                              siteProv.fillCurrentShiftID(
+                                  Provider.of<ShiftsData>(context,
+                                          listen: false)
+                                      .shiftsBySite[widget.index]
+                                      .shiftId);
+                              siteProv.setDropDownShift(widget.index + 1);
 
-                          Navigator.of(context).push(
-                            new MaterialPageRoute(
-                              builder: (context) => UsersScreen(
-                                widget.siteIndex + 1,
-                                true,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Container(
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: Colors.orange, width: 1)),
-                            padding: EdgeInsets.all(9),
-                            child: Icon(
-                              Icons.person,
-                              size: 18,
-                              color: Colors.orange,
-                            )),
-                      )
-                      // CircularIconButton(
-                      //     icon: Icons.person,
-                      //     onTap: () {
-                      //       Navigator.of(context).push(
-                      //         new MaterialPageRoute(
-                      //           builder: (context) =>
-                      //               UsersScreen(widget.index + 1),
-                      //         ),
-                      //       );
-                      //     },
-                      //   ),
-                    ],
+                              siteProv.fillCurrentShiftID(
+                                  Provider.of<ShiftsData>(context,
+                                          listen: false)
+                                      .shiftsBySite[widget.index]
+                                      .shiftId);
+                              print(siteProv.sitesList[widget.siteIndex].name);
+                              print("finding matching shifts");
+                              shiftProv.findMatchingShifts(
+                                  siteProv.sitesList[widget.siteIndex].id,
+                                  true);
+                              // var index = getSiteName(siteProv.currentSiteName);
+
+                              // print(siteProv.sitesList[index].name);
+                              // shiftProv.findMatchingShifts(siteProv.sitesList[0].name, ddallshiftsBool)
+                              Navigator.of(context).push(
+                                new MaterialPageRoute(
+                                  builder: (context) => UsersScreen(
+                                    widget.siteIndex + 1,
+                                    true,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Colors.orange, width: 1)),
+                                padding: EdgeInsets.all(9),
+                                child: Icon(
+                                  Icons.person,
+                                  size: 18,
+                                  color: Colors.orange,
+                                )),
+                          )
+                          // CircularIconButton(
+                          //     icon: Icons.person,
+                          //     onTap: () {
+                          //       Navigator.of(context).push(
+                          //         new MaterialPageRoute(
+                          //           builder: (context) =>
+                          //               UsersScreen(widget.index + 1),
+                          //         ),
+                          //       );
+                          //     },
+                          //   ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            )),
+                )),
       ),
     );
+  }
+
+  int getSiteName(String siteName) {
+    var list = Provider.of<SiteData>(context, listen: false).sitesList;
+    int index = list.length;
+    for (int i = 0; i < index; i++) {
+      if (siteName == list[i].name) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   showShiftDetails() {
