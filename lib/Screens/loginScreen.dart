@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([]);
-    final node = FocusScope.of(context);
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
@@ -323,6 +323,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     title: 'خطأ في التسجيل',
                     content:
                         "لقد ادخلت رقم او كلمة سر خاطئة \n  برجاء اعادة المحاولة مرة اخرى");
+              }).then((value) {
+            setState(() {
+              isLoading = false;
+            });
+          });
+        } else if (value == -5) {
+          return showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return RoundedAlertOkOnly(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    title: "الأنترنت ضعيف",
+                    content: "برجاء اعادة المحاولة مرة اخرى");
               }).then((value) {
             setState(() {
               isLoading = false;

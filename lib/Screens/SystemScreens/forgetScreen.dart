@@ -760,6 +760,21 @@ class _ForgetSetPasswordState extends State<ForgetSetPassword> {
             isLoading = false;
           });
         });
+      } else if (value == -5) {
+        return showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return RoundedAlertOkOnly(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  title: 'الأنترنت ضعيف',
+                  content: "برجاء المحاولة مرة اخرى");
+            }).then((value) {
+          setState(() {
+            isLoading = false;
+          });
+        });
       } else if (value == -3) {
         return showDialog(
             context: context,

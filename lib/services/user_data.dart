@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:connectivity/connectivity.dart';
-import 'package:device_info/device_info.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_is_emulator/flutter_is_emulator.dart';
+
+
 import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -42,15 +43,16 @@ class UserData with ChangeNotifier {
     id: "",
   );
   List<String> cachedUserData = [];
-setCacheduserData(List<String>cached){
-cachedUserData=cached;
-notifyListeners();
-}
+  setCacheduserData(List<String> cached) {
+    cachedUserData = cached;
+    notifyListeners();
+  }
+
   final _apiToken = 'ByYM000OLlMQG6VVVp1OH7Xzyr7gHuw1qvUC5dcGt3SNM';
   bool loggedIn = false;
-  Future<bool> isConnectedToInternet() async {
+  Future<bool> isConnectedToInternet(String url) async {
     try {
-      final result = await InternetAddress.lookup('google.com');
+      final result = await InternetAddress.lookup(url);
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         print('connected');
         return true;
@@ -77,77 +79,77 @@ notifyListeners();
   Future<int> loginPost(
       String username, String password, BuildContext context) async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-    print("conecction stats  $connectivityResult");
+
     if (connectivityResult != ConnectivityResult.none) {
       try {
-        final response = await http.post("$baseURL/api/Authenticate/login",
-            body: json.encode(
-              {"Username": username, "Password": password},
-            ),
-            headers: {
-              'Content-type': 'application/json',
-              'x-api-key': _apiToken
-            });
-
-        var decodedRes = json.decode(response.body);
-        
-        print("token is :${decodedRes["token"]}");
-        if (decodedRes["message"] == "Success : ") {
-          user.userToken = decodedRes["token"];
-          user.id = decodedRes["userData"]["id"];
-          user.userID = decodedRes["userData"]["userName"];
-          user.name = decodedRes["userData"]["userName1"];
-          user.userJob = decodedRes["userData"]["userJob"];
-          user.email = decodedRes["userData"]["email"];
-          user.phoneNum = decodedRes["userData"]["phoneNumber"];
-          user.userType = decodedRes["userData"]["userType"];
-
-          user.userSiteId = decodedRes["companyData"]["siteId"] as int;
-
-          user.userShiftId = decodedRes["userData"]["shiftId"];
-          user.userImage = "$baseURL/${decodedRes["userData"]["userImage"]}";
-
-          changedPassword = decodedRes["userData"]["changedPassword"] as bool;
-
-          siteName = decodedRes["companyData"]["siteName"];
-
-          var companyId = decodedRes["companyData"]["id"];
-
-          var msg = await Provider.of<CompanyData>(context, listen: false)
-              .getCompanyProfileApi(companyId, user.userToken,context);
-
-          if (msg == "Success") {
-            print("login -------------- ${user.userSiteId} ");
-            print("changedPassword -------------- $changedPassword ");
-         
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            String comImageFilePath = await _fileFromImageUrl(
-                "$baseURL/${decodedRes["companyData"]["logo"]}", "CompanyLogo");
-            String userImage = await _fileFromImageUrl(
-                "$baseURL/${decodedRes["userData"]["userImage"]}", "userImage");
-
-            print(comImageFilePath);
-     print(userImage);
-            List<String> userData = [
-              user.name,
-              user.userJob,
-              userImage,
-              decodedRes["companyData"]["nameAr"],
-              comImageFilePath
-            ];
-            prefs.setStringList("allUserData", userData);
-
-            loggedIn = true;
-
-            notifyListeners();
-            return user.userType;
+        var stability = await isConnectedToInternet("www.google.com");
+        if (stability) {
+          if (await isConnectedToInternet("www.tamauzeds.com") == false) {
+            return -3;
           }
-        } else if (decodedRes["message"] ==
-            "Failed : user name and password not match ") {
-          return -2;
-        } else if (decodedRes["message"] ==
-            "Fail : This Company is suspended") {
-          return -4;
+          final response = await http.post("$baseURL/api/Authenticate/login",
+              body: json.encode(
+                {"Username": username, "Password": password},
+              ),
+              headers: {
+                'Content-type': 'application/json',
+                'x-api-key': _apiToken
+              }).timeout(
+              Duration(
+                seconds: 60,
+              ), onTimeout: () {
+            return;
+          });
+
+          var decodedRes = json.decode(response.body);
+
+          print("token is :${decodedRes["token"]}");
+          if (decodedRes["message"] == "Success : ") {
+            user.userToken = decodedRes["token"];
+            user.id = decodedRes["userData"]["id"];
+            user.userID = decodedRes["userData"]["userName"];
+            user.name = decodedRes["userData"]["userName1"];
+            user.userJob = decodedRes["userData"]["userJob"];
+            user.email = decodedRes["userData"]["email"];
+            user.phoneNum = decodedRes["userData"]["phoneNumber"];
+            user.userType = decodedRes["userData"]["userType"];
+            user.userSiteId = decodedRes["companyData"]["siteId"] as int;
+            user.userShiftId = decodedRes["userData"]["shiftId"];
+            user.userImage = "$baseURL/${decodedRes["userData"]["userImage"]}";
+            changedPassword = decodedRes["userData"]["changedPassword"] as bool;
+            siteName = decodedRes["companyData"]["siteName"];
+            var companyId = decodedRes["companyData"]["id"];
+            var msg = await Provider.of<CompanyData>(context, listen: false)
+                .getCompanyProfileApi(companyId, user.userToken, context);
+            if (msg == "Success") {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              String comImageFilePath = await _fileFromImageUrl(
+                  "$baseURL/${decodedRes["companyData"]["logo"]}",
+                  "CompanyLogo");
+              String userImage = await _fileFromImageUrl(
+                  "$baseURL/${decodedRes["userData"]["userImage"]}",
+                  "userImage");
+              List<String> userData = [
+                user.name,
+                user.userJob,
+                userImage,
+                decodedRes["companyData"]["nameAr"],
+                comImageFilePath
+              ];
+              prefs.setStringList("allUserData", userData);
+              loggedIn = true;
+              notifyListeners();
+              return user.userType;
+            }
+          } else if (decodedRes["message"] ==
+              "Failed : user name and password not match ") {
+            return -2;
+          } else if (decodedRes["message"] ==
+              "Fail : This Company is suspended") {
+            return -4;
+          }
+        } else if (!stability) {
+          return -5;
         }
       } catch (e) {
         print(e);
@@ -159,7 +161,7 @@ notifyListeners();
   }
 
   Future<String> forgetPassword(String username, String email) async {
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       try {
         final response = await http.put("$baseURL/api/Users/ForgetPassword",
             body: json.encode(
@@ -190,7 +192,7 @@ notifyListeners();
 
   Future<String> setPassword(
       {String pinCode, String username, String password}) async {
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       try {
         final response = await http.put("$baseURL/api/Users/NewPassword",
             body: json.encode(
@@ -228,7 +230,7 @@ notifyListeners();
     print(image.lengthSync());
     String msg;
     print("uploading image......$cardCode...${cardCode.length}...");
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       int locationService = await getCurrentLocation();
       if (locationService == 0) {
         var stream = new http.ByteStream(Stream.castFrom(image.openRead()));
@@ -291,7 +293,7 @@ notifyListeners();
   Future<String> attend({String qrCode}) async {
     print("attend --${user.userID}----$qrCode");
     String msg;
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       int locationService = await getCurrentLocation();
       if (locationService == 0) {
         String imei = await getDeviceUUID();
@@ -378,7 +380,7 @@ notifyListeners();
     print(_image.lengthSync());
     var url = "";
 
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       await uploadImage(_image, user.id).then((value) async {
         if (value != "") {
           print("path :$value");
@@ -404,7 +406,7 @@ notifyListeners();
 
   Future<String> editProfile(String password) async {
     print("${user.id} -----edit-- $password");
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       try {
         final response = await http.put("$baseURL/api/Users/UpdatePassword",
             body: json.encode(
@@ -437,7 +439,7 @@ notifyListeners();
     String imei = await getDeviceUUID();
     print("${user.id} -----edit-- $password --- mac$imei ");
 
-    if (await isConnectedToInternet()) {
+    if (await isConnectedToInternet("www.google.com")) {
       try {
         final response = await http.put("$baseURL/api/Users/UpdatePassword",
             body: json.encode(
@@ -512,8 +514,9 @@ notifyListeners();
     if (Platform.isIOS) {
       if (enabled) {
         bool isMock = await detectJailBreak();
-        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
-        if (!isMock && !isEmulator) {
+       
+          
+        if (!isMock ) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {
@@ -531,8 +534,9 @@ notifyListeners();
     } else {
       if (enabled) {
         bool isMockLocation = await TrustLocation.isMockLocation;
-                        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
-        if (!isMockLocation && !isEmulator) {
+     
+         
+        if (!isMockLocation ) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {

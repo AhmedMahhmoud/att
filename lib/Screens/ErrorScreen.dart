@@ -160,6 +160,11 @@ class _ErrorScreenState extends State<ErrorScreen> {
         } else if (value == -2) {
           Navigator.of(context).pushReplacement(
               new MaterialPageRoute(builder: (context) => LoginScreen()));
+        } else if (value == -5) {
+          setState(() {
+            isLoading = false;
+            message = "الأنترنت ضعيف\nبرجاء المحاولة مرة اخرى";
+          });
         } else if (value == -3) {
           setState(() {
             isLoading = false;

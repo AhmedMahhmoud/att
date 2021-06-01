@@ -164,6 +164,9 @@ class RoundedSearchBar extends StatelessWidget {
                                                     .forEach((element) {
                                                   if (element.shiftId ==
                                                       prov.currentShiftID) {
+                                                    print(
+                                                        "element id :${element.shiftId}");
+
                                                     finalTest.add(element);
                                                   }
                                                   Provider.of<MemberData>(
@@ -273,7 +276,6 @@ class RoundedSearchBar extends StatelessWidget {
                                                     .sitesList[
                                                         prov.dropDownSitesIndex]
                                                     .id,
-                                                true,
                                                 true);
 
                                         prov.fillCurrentShiftID(
@@ -346,7 +348,8 @@ class _UsersScreenState extends State<UsersScreen> {
             .dropDownSitesList[siteIndex]
             .id,
         comProvier.com.id,
-        userProvider.user.userToken,context);
+        userProvider.user.userToken,
+        context);
     refreshController.refreshCompleted();
   }
 
@@ -363,14 +366,16 @@ class _UsersScreenState extends State<UsersScreen> {
 
     if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
       await Provider.of<SiteData>(context, listen: false)
-          .getSitesByCompanyId(comProvier.com.id, userProvider.user.userToken,context)
+          .getSitesByCompanyId(
+              comProvier.com.id, userProvider.user.userToken, context)
           .then((value) async {
         print("Got Sites");
       });
     }
     if (Provider.of<ShiftsData>(context, listen: false).shiftsList.isEmpty) {
       await Provider.of<ShiftsData>(context, listen: false)
-          .getAllCompanyShifts(comProvier.com.id, userProvider.user.userToken,context)
+          .getAllCompanyShifts(
+              comProvier.com.id, userProvider.user.userToken, context)
           .then((value) async {
         print("Got shifts");
       });
@@ -387,7 +392,8 @@ class _UsersScreenState extends State<UsersScreen> {
                     .dropDownSitesList[siteIndex]
                     .id,
                 comProvier.com.id,
-                userProvider.user.userToken,context);
+                userProvider.user.userToken,
+                context);
 
         List<Member> finalTest = [];
 
@@ -410,12 +416,13 @@ class _UsersScreenState extends State<UsersScreen> {
                 .dropDownSitesList[siteIndex]
                 .id,
             comProvier.com.id,
-            userProvider.user.userToken,context);
+            userProvider.user.userToken,
+            context);
       }
     } else {
       await Provider.of<MemberData>(context, listen: false)
           .getAllCompanyMember(
-              -1, comProvier.com.id, userProvider.user.userToken,context)
+              -1, comProvier.com.id, userProvider.user.userToken, context)
           .then((value) async {
         print("Got members");
       });
@@ -599,7 +606,8 @@ class _UsersScreenState extends State<UsersScreen> {
                                                                   .com
                                                                   .id,
                                                               userProvider.user
-                                                                  .userToken,context);
+                                                                  .userToken,
+                                                              context);
                                                       setState(() {
                                                         widget.selectedValue =
                                                             Provider.of<SiteData>(
@@ -663,7 +671,7 @@ class _UsersScreenState extends State<UsersScreen> {
                                                                                                 return RoundedLoadingIndicator();
                                                                                               });
                                                                                           var token = Provider.of<UserData>(context, listen: false).user.userToken;
-                                                                                          if (await memberData.deleteMember(memberData.membersListScreenDropDownSearch[index].id, index, token,context) == "Success") {
+                                                                                          if (await memberData.deleteMember(memberData.membersListScreenDropDownSearch[index].id, index, token, context) == "Success") {
                                                                                             Navigator.pop(context);
                                                                                             Fluttertoast.showToast(
                                                                                               msg: "تم الحذف بنجاح",
@@ -932,6 +940,17 @@ class _MemberTileState extends State<MemberTile> {
     return -1;
   }
 
+  String getShiftName() {
+    var list = Provider.of<ShiftsData>(context, listen: false).shiftsList;
+    int index = list.length;
+    for (int i = 0; i < index; i++) {
+      if (list[i].shiftId == widget.user.shiftId) {
+        return list[i].shiftName;
+      }
+    }
+    return "";
+  }
+
   int getShiftListIndex(int shiftId) {
     var list = Provider.of<ShiftsData>(context, listen: false).shiftsList;
     int index = list.length;
@@ -967,6 +986,7 @@ class _MemberTileState extends State<MemberTile> {
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       child: InkWell(
         onTap: () {
+          print(widget.user.shiftId);
           showUserDetails(widget.user);
         },
         child: Card(
@@ -1060,6 +1080,7 @@ class _MemberTileState extends State<MemberTile> {
         context: context,
         builder: (BuildContext context) {
           return GestureDetector(
+            onTap: () => print(member.shiftId),
             child: Dialog(
                 shape: RoundedRectangleBorder(
                     borderRadius:
@@ -1173,12 +1194,8 @@ class _MemberTileState extends State<MemberTile> {
                                           height: 10.0.h,
                                         ),
                                         UserDataField(
-                                          icon: Icons.query_builder,
-                                          text: Provider.of<ShiftsData>(context,
-                                                  listen: true)
-                                              .shiftsList[shiftId]
-                                              .shiftName,
-                                        )
+                                            icon: Icons.query_builder,
+                                            text: getShiftName())
                                       ],
                                     ),
                                   ),

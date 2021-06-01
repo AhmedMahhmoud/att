@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_is_emulator/flutter_is_emulator.dart';
+
+
 import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -134,8 +135,8 @@ await getCompanyProfileApi(companyId, userToken, context);
       // && pos[0] != null
       if (enabled) {
         bool isMockLocation = await TrustLocation.isMockLocation;
-                        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
-        if (!isMockLocation && !isEmulator) {
+                        // bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
+        if (!isMockLocation ) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {
@@ -158,8 +159,8 @@ await getCompanyProfileApi(companyId, userToken, context);
       // && pos[0] != null
       if (enabled) {
         bool isMockLocation = await detectJailBreak();
-                        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
-        if (!isMockLocation && !isEmulator) {
+           
+        if (!isMockLocation ) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {

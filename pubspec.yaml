@@ -70,13 +70,11 @@ dependencies:
   google_fonts: ^1.1.2
   showcaseview: ^1.0.0
   get_mac: ^0.0.1
-  device_info_plus:
   flutter_secure_storage:
   auto_size_text: ^2.1.0
   flutter_jailbreak_detection: ^1.4.0
   connectivity: ^3.0.6
   shimmer: ^2.0.0
-  flutter_is_emulator: ^1.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

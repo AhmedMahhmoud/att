@@ -16,9 +16,9 @@ class ShiftsData with ChangeNotifier {
   List<Shift> shiftsBySite = [];
   Future futureListener;
 
-  InheritDefault inherit=InheritDefault();
+  InheritDefault inherit = InheritDefault();
 
-  findMatchingShifts(int siteId, bool notInit, bool addallshiftsBool) {
+  findMatchingShifts(int siteId, bool addallshiftsBool) {
     print("findMatchingShifts : $siteId");
     shiftsBySite =
         shiftsList.where((element) => element.siteID == siteId).toList();
@@ -45,7 +45,7 @@ class ShiftsData with ChangeNotifier {
             siteID: 0)
       ];
     }
-   
+
     return shiftsBySite.length;
   }
 
@@ -58,7 +58,8 @@ class ShiftsData with ChangeNotifier {
     }
   }
 
-  deleteShift(int shiftId, String userToken, int listIndex,BuildContext context) async {
+  deleteShift(int shiftId, String userToken, int listIndex,
+      BuildContext context) async {
     if (await isConnectedToInternet()) {
       try {
         final response = await http.delete("$baseURL/api/Shifts/$shiftId",
@@ -67,37 +68,36 @@ class ShiftsData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-         if (response.statusCode==401)
-        {
-        await  inherit.login(context);
-        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
-        await deleteShift(shiftId, userToken, listIndex,context);
-        }
-        else if (response.statusCode==200 || response.statusCode==201)
-        {      var decodedRes = json.decode(response.body);
-        print(response.body);
+        if (response.statusCode == 401) {
+          await inherit.login(context);
+          userToken =
+              Provider.of<UserData>(context, listen: false).user.userToken;
+          await deleteShift(shiftId, userToken, listIndex, context);
+        } else if (response.statusCode == 200 || response.statusCode == 201) {
+          var decodedRes = json.decode(response.body);
+          print(response.body);
 
-
-        if (decodedRes["message"] == "Success") {
-          if (shiftsBySite.length > 1) {
-            shiftsBySite.removeAt(listIndex);
-          } else {
-            shiftsBySite = [
-              Shift(
-                  shiftName: "لا يوجد مناوبات بهذا الموقع",
-                  shiftStartTime: -1,
-                  shiftEndTime: 0,
-                  shiftId: 0,
-                  siteID: 0)
-            ];
+          if (decodedRes["message"] == "Success") {
+            if (shiftsBySite.length > 1) {
+              shiftsBySite.removeAt(listIndex);
+            } else {
+              shiftsBySite = [
+                Shift(
+                    shiftName: "لا يوجد مناوبات بهذا الموقع",
+                    shiftStartTime: -1,
+                    shiftEndTime: 0,
+                    shiftId: 0,
+                    siteID: 0)
+              ];
+            }
+            deleteFromAllShiftsList(shiftId);
+            notifyListeners();
+            return "Success";
+          } else if (decodedRes["message"] ==
+              "Fail : You must delete all users in shift then delete shift") {
+            return "hasData";
           }
-          deleteFromAllShiftsList(shiftId);
-          notifyListeners();
-          return "Success";
-        } else if (decodedRes["message"] ==
-            "Fail : You must delete all users in shift then delete shift") {
-          return "hasData";
-        }}
+        }
       } catch (e) {
         print(e);
       }
@@ -111,22 +111,22 @@ class ShiftsData with ChangeNotifier {
     try {
       final result = await InternetAddress.lookup('google.com');
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-   
         return true;
       }
     } on SocketException catch (_) {
-    
       return false;
     }
     return false;
   }
 
-  Future getAllCompanyShifts(int companyId, String userToken,BuildContext context) async {
-    futureListener = getAllCompanyShiftsApi(companyId, userToken,context);
+  Future getAllCompanyShifts(
+      int companyId, String userToken, BuildContext context) async {
+    futureListener = getAllCompanyShiftsApi(companyId, userToken, context);
     return futureListener;
   }
 
-  getAllCompanyShiftsApi(int companyId, String userToken,BuildContext context ) async {
+  getAllCompanyShiftsApi(
+      int companyId, String userToken, BuildContext context) async {
     List<Shift> shiftsNewList;
     if (await isConnectedToInternet()) {
       try {
@@ -137,31 +137,34 @@ class ShiftsData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
-       if (response.statusCode==401)
-        {
-        await  inherit.login(context);
-        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
-        await getAllCompanyShiftsApi(companyId, userToken, context,);
+        if (response.statusCode == 401) {
+          await inherit.login(context);
+          userToken =
+              Provider.of<UserData>(context, listen: false).user.userToken;
+          await getAllCompanyShiftsApi(
+            companyId,
+            userToken,
+            context,
+          );
+        } else if (response.statusCode == 200 || response.statusCode == 201) {
+          var decodedRes = json.decode(response.body);
+          print(response.body);
+
+          if (decodedRes["message"] == "Success") {
+            var shiftObjJson = jsonDecode(response.body)['data'] as List;
+            shiftsNewList = shiftObjJson
+                .map((shiftJson) => Shift.fromJson(shiftJson))
+                .toList();
+
+            shiftsList = shiftsNewList;
+            notifyListeners();
+
+            return "Success";
+          } else if (decodedRes["message"] ==
+              "Failed : user name and password not match ") {
+            return "wrong";
+          }
         }
-        else if (response.statusCode==200 || response.statusCode==201)
-        {      var decodedRes = json.decode(response.body);
-        print(response.body);
-
-
-        if (decodedRes["message"] == "Success") {
-          var shiftObjJson = jsonDecode(response.body)['data'] as List;
-          shiftsNewList = shiftObjJson
-              .map((shiftJson) => Shift.fromJson(shiftJson))
-              .toList();
-
-          shiftsList = shiftsNewList;
-          notifyListeners();
-
-          return "Success";
-        } else if (decodedRes["message"] ==
-            "Failed : user name and password not match ") {
-          return "wrong";
-        }}
       } catch (e) {
         print(e);
       }
@@ -171,7 +174,7 @@ class ShiftsData with ChangeNotifier {
     }
   }
 
-  addShift(Shift shift, String userToken,BuildContext context) async {
+  addShift(Shift shift, String userToken, BuildContext context) async {
     print(shift.siteID);
     if (await isConnectedToInternet()) {
       try {
@@ -189,37 +192,40 @@ class ShiftsData with ChangeNotifier {
               'Authorization': "Bearer $userToken"
             });
 
+        if (response.statusCode == 401) {
+          await inherit.login(context);
+          userToken =
+              Provider.of<UserData>(context, listen: false).user.userToken;
+          await addShift(
+            shift,
+            userToken,
+            context,
+          );
+        } else if (response.statusCode == 200 || response.statusCode == 201) {
+          var decodedRes = json.decode(response.body);
+          print(response.body);
 
-       if (response.statusCode==401)
-        {
-        await  inherit.login(context);
-        userToken=Provider.of<UserData>(context,listen: false).user.userToken;
-        await addShift(shift, userToken, context,);
+          if (decodedRes["message"] == "Success") {
+            Shift newShift = Shift(
+                shiftId: decodedRes['data']['id'] as int,
+                shiftName: decodedRes['data']['shiftName'],
+                shiftStartTime: int.parse(decodedRes['data']['shiftSttime']),
+                shiftEndTime: int.parse(decodedRes['data']['shiftEntime']),
+                siteID: decodedRes['data']['siteId'] as int);
+
+            shiftsList.add(newShift);
+            notifyListeners();
+            return "Success";
+          } else if (decodedRes["message"] ==
+              "Fail : The same shift name already exists in site") {
+            return "exists";
+          } else if (decodedRes["message"] == "Fail : Time constants error") {
+            print("s");
+            return decodedRes["data"];
+          } else {
+            return "failed";
+          }
         }
-        else if (response.statusCode==200 || response.statusCode==201)
-        {      var decodedRes = json.decode(response.body);
-        print(response.body);
-
-        if (decodedRes["message"] == "Success") {
-          Shift newShift = Shift(
-              shiftId: decodedRes['data']['id'] as int,
-              shiftName: decodedRes['data']['shiftName'],
-              shiftStartTime: int.parse(decodedRes['data']['shiftSttime']),
-              shiftEndTime: int.parse(decodedRes['data']['shiftEntime']),
-              siteID: decodedRes['data']['siteId'] as int);
-
-          shiftsList.add(newShift);
-          notifyListeners();
-          return "Success";
-        } else if (decodedRes["message"] ==
-            "Fail : The same shift name already exists in site") {
-          return "exists";
-        } else if (decodedRes["message"] == "Fail : Time constants error") {
-          print("s");
-          return decodedRes["data"];
-        } else {
-          return "failed";
-        }}
       } catch (e) {
         print(e);
       }
@@ -237,7 +243,7 @@ class ShiftsData with ChangeNotifier {
     }
   }
 
-  editShift(Shift shift, int id, String usertoken,BuildContext context) async {
+  editShift(Shift shift, int id, String usertoken, BuildContext context) async {
     print("Shift ID : ${shift.shiftId}");
     print("Site ID : ${shift.siteID}");
     print("index : $id");
@@ -259,40 +265,44 @@ class ShiftsData with ChangeNotifier {
               'Authorization': "Bearer $usertoken"
             });
 
-      
-       if (response.statusCode==401)
-        {
-        await  inherit.login(context);
-        usertoken=Provider.of<UserData>(context,listen: false).user.userToken;
-        await editShift(shift,id, usertoken, context,);
+        if (response.statusCode == 401) {
+          await inherit.login(context);
+          usertoken =
+              Provider.of<UserData>(context, listen: false).user.userToken;
+          await editShift(
+            shift,
+            id,
+            usertoken,
+            context,
+          );
+        } else if (response.statusCode == 200 || response.statusCode == 201) {
+          var decodedRes = json.decode(response.body);
+          print(response.body);
+
+          if (decodedRes["message"] == "Success") {
+            Shift newShift = Shift(
+                shiftId: decodedRes['data']['id'],
+                shiftName: decodedRes['data']['shiftName'],
+                shiftStartTime: int.parse(decodedRes['data']['shiftSttime']),
+                shiftEndTime: int.parse(decodedRes['data']['shiftEntime']),
+                siteID: decodedRes['data']['siteId'] as int);
+            var shiftsListIndex = findShiftIndexInShiftsList(shift.shiftId);
+
+            shiftsList[shiftsListIndex] = newShift;
+            shiftsBySite[id] = newShift;
+            notifyListeners();
+
+            return "Success";
+          } else if (decodedRes["message"] ==
+              "Fail : Shift Name already exists") {
+            return "exists";
+          } else if (decodedRes["message"] == "Fail : Time constants error") {
+            print("s");
+            return decodedRes["data"];
+          } else {
+            return "failed";
+          }
         }
-        else if (response.statusCode==200 || response.statusCode==201)
-        {      var decodedRes = json.decode(response.body);
-        print(response.body);
-
-        if (decodedRes["message"] == "Success") {
-          Shift newShift = Shift(
-              shiftId: decodedRes['data']['id'],
-              shiftName: decodedRes['data']['shiftName'],
-              shiftStartTime: int.parse(decodedRes['data']['shiftSttime']),
-              shiftEndTime: int.parse(decodedRes['data']['shiftEntime']),
-              siteID: decodedRes['data']['siteId'] as int);
-          var shiftsListIndex = findShiftIndexInShiftsList(shift.shiftId);
-
-          shiftsList[shiftsListIndex] = newShift;
-          shiftsBySite[id] = newShift;
-          notifyListeners();
-
-          return "Success";
-        } else if (decodedRes["message"] ==
-            "Fail : Shift Name already exists") {
-          return "exists";
-        } else if (decodedRes["message"] == "Fail : Time constants error") {
-          print("s");
-          return decodedRes["data"];
-        } else {
-          return "failed";
-        }}
       } catch (e) {
         print(e);
       }
@@ -302,47 +312,47 @@ class ShiftsData with ChangeNotifier {
     }
   }
 }
-  // Future<void> getCompanySites(int companyID, String userToken) async {
-  //   print("GETTING COMPANY SITES NEWWW");
-  //   String url = "https://attendanceback.tamauze.com/api/Company/$companyID";
-  //   try {
-  //     companySitesProv = [];
-  //     final response = await http.get(
-  //       url,
-  //       headers: {
-  //         "Accept": "application/json",
-  //         'Authorization': "Bearer $userToken"
-  //       },
-  //     );
-  //     var decodedRes = json.decode(response.body);
-  //     if (jsonDecode(response.body)["message"] == "Success") {
-  //       var jsonObj = await jsonDecode(response.body)["data"] as List;
-  //       companySitesProv = jsonObj
-  //           .map((categoires) => CompanySites.fromJson(categoires))
-  //           .toList();
+// Future<void> getCompanySites(int companyID, String userToken) async {
+//   print("GETTING COMPANY SITES NEWWW");
+//   String url = "https://attendanceback.tamauze.com/api/Company/$companyID";
+//   try {
+//     companySitesProv = [];
+//     final response = await http.get(
+//       url,
+//       headers: {
+//         "Accept": "application/json",
+//         'Authorization': "Bearer $userToken"
+//       },
+//     );
+//     var decodedRes = json.decode(response.body);
+//     if (jsonDecode(response.body)["message"] == "Success") {
+//       var jsonObj = await jsonDecode(response.body)["data"] as List;
+//       companySitesProv = jsonObj
+//           .map((categoires) => CompanySites.fromJson(categoires))
+//           .toList();
 
-  //       for (int i = 0; i < companySitesProv.length; i++) {
-  //         for (int k = 0; k < companySitesProv[i].shiftsList.length; k++) {
-  //           print(companySitesProv[i].shiftsList.length);
-  //           sitess.addAll(
-  //               {companySitesProv[i].siteID: companySitesProv[k].shiftsList});
-  //         }
-  //       }
-  //       print(sitess.length);
-  //       print(sitess.keys);
-  //       print(sitess.values);
-  //       print(sitess[4].length);
+//       for (int i = 0; i < companySitesProv.length; i++) {
+//         for (int k = 0; k < companySitesProv[i].shiftsList.length; k++) {
+//           print(companySitesProv[i].shiftsList.length);
+//           sitess.addAll(
+//               {companySitesProv[i].siteID: companySitesProv[k].shiftsList});
+//         }
+//       }
+//       print(sitess.length);
+//       print(sitess.keys);
+//       print(sitess.values);
+//       print(sitess[4].length);
 
-  //       // print(companySitesProv[0].shiftsList.length);
-  //       // print(companySitesProv[0].shiftsList[1].shiftName);
+//       // print(companySitesProv[0].shiftsList.length);
+//       // print(companySitesProv[0].shiftsList[1].shiftName);
 
-  //       // print(companySitesProv.length);
-  //       // print(companySitesProv[0].siteName);
-  //       // print("shhift id ${companySitesProv[0].shiftsList[0].shifID}");
+//       // print(companySitesProv.length);
+//       // print(companySitesProv[0].siteName);
+//       // print("shhift id ${companySitesProv[0].shiftsList[0].shifID}");
 
-  //       notifyListeners();
-  //     }
-  //   } catch (e) {
-  //     print(e);
-  //   }
-  // }
+//       notifyListeners();
+//     }
+//   } catch (e) {
+//     print(e);
+//   }
+// }
