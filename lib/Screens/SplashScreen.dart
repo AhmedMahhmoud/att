@@ -29,17 +29,15 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   bool isLoading = false;
 
-  Future  checkSharedUserData() async {
+  Future checkSharedUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> userData = (prefs.getStringList('userData') ?? null);
     print(userData);
     if (userData == null || userData.isEmpty) {
-      print('null');
       await reverse("", 1);
     } else {
-  
       var value = await login(userName: userData[0], password: userData[1]);
-      print('not null------$value');
+      print("VALUE OF USER $value");
       reverse(userData[0], value);
     }
   }
@@ -60,20 +58,18 @@ class _SplashScreenState extends State<SplashScreen>
     var cachedUserData = (prefs.getStringList('allUserData') ?? null);
     if (cachedUserData == null || cachedUserData.isEmpty) {
       print('null');
-
     } else {
       print('not null');
       print(cachedUserData[4]);
-    Provider.of<UserData>(context, listen: false).setCacheduserData(cachedUserData);
-
-    
+      Provider.of<UserData>(context, listen: false)
+          .setCacheduserData(cachedUserData);
     }
   }
 
   AnimationController animationController;
   reverse(String userName, value) {
     //Reverse animation Function
-var userData=Provider.of<UserData>(context,listen: false);
+    var userData = Provider.of<UserData>(context, listen: false);
     setState(() {
       animationController.reverse();
       Timer(new Duration(milliseconds: 2000), () async {
@@ -89,11 +85,12 @@ var userData=Provider.of<UserData>(context,listen: false);
           } else {
             if (value > 0) {
               print(" usertype $value");
-          
 
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) {
-                return            userData.cachedUserData.isNotEmpty?  ErrorScreen2(child: NavScreenTwo(0)):NavScreenTwo(0);
+                return userData.cachedUserData.isNotEmpty
+                    ? ErrorScreen2(child: NavScreenTwo(0))
+                    : NavScreenTwo(0);
                 // return ShowCaseWidget(
                 //   onStart: (index, key) {
                 //     log('onStart: $index, $key');
@@ -118,12 +115,13 @@ var userData=Provider.of<UserData>(context,listen: false);
 
               getUserData();
             } else if (value == 0) {
-              print("normal user");
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        Container(child:        userData.cachedUserData.isNotEmpty?  ErrorScreen2(child: HomePage()):HomePage()),
+                    builder: (context) => Container(
+                        child: userData.cachedUserData.isNotEmpty
+                            ? ErrorScreen2(child: HomePage())
+                            : HomePage()),
                   ));
               getUserData();
             } else if (value == -1) {
@@ -131,6 +129,11 @@ var userData=Provider.of<UserData>(context,listen: false);
               Navigator.of(context).pushReplacement(new MaterialPageRoute(
                   builder: (context) =>
                       ErrorScreen("لا يوجد اتصال بالانترنت", true)));
+            } else if (value == -5) {
+              await getUserData();
+              Navigator.of(context).pushReplacement(new MaterialPageRoute(
+                  builder: (context) => ErrorScreen(
+                      "الأنترنت ضعيف \nبرجاء اعادة المحاولة", true)));
             } else if (value == -2) {
               Navigator.of(context).pushReplacement(
                   new MaterialPageRoute(builder: (context) => LoginScreen()));

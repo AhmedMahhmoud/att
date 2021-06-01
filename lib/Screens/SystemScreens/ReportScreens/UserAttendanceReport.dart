@@ -128,7 +128,7 @@ class _UserAttendanceReportScreenState
 
   int siteId = 0;
   int siteIdIndex = 0;
-
+final focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
@@ -137,14 +137,15 @@ class _UserAttendanceReportScreenState
       builder: (context, reportsData, child) {
         return WillPopScope(
           onWillPop: onWillPop,
-          child: Scaffold(
-            backgroundColor: Colors.white,
-            body: Container(
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onPanDown: (_) {
-                  FocusScope.of(context).unfocus();
-                },
+          child: GestureDetector(
+            onTap: (){
+                           print(_nameController.text);
+                  _nameController.text == ""?FocusScope.of(context).unfocus():
+SystemChannels.textInput.invokeMethod('TextInput.hide');
+            },
+            child: Scaffold(
+              backgroundColor: Colors.white,
+              body: Container(
                 child: Stack(
                   children: [
                     Column(
@@ -578,6 +579,7 @@ class _UserAttendanceReportScreenState
                                         ),
                                         _nameController.text != ""
                                             ? Expanded(
+                                              
                                                 child: FutureBuilder(
                                                     future: Provider.of<
                                                                 ReportsData>(

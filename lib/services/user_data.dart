@@ -42,10 +42,11 @@ class UserData with ChangeNotifier {
     id: "",
   );
   List<String> cachedUserData = [];
-setCacheduserData(List<String>cached){
-cachedUserData=cached;
-notifyListeners();
-}
+  setCacheduserData(List<String> cached) {
+    cachedUserData = cached;
+    notifyListeners();
+  }
+
   final _apiToken = 'ByYM000OLlMQG6VVVp1OH7Xzyr7gHuw1qvUC5dcGt3SNM';
   bool loggedIn = false;
   Future<bool> isConnectedToInternet() async {
@@ -77,77 +78,74 @@ notifyListeners();
   Future<int> loginPost(
       String username, String password, BuildContext context) async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-    print("conecction stats  $connectivityResult");
+
     if (connectivityResult != ConnectivityResult.none) {
       try {
-        final response = await http.post("$baseURL/api/Authenticate/login",
-            body: json.encode(
-              {"Username": username, "Password": password},
-            ),
-            headers: {
-              'Content-type': 'application/json',
-              'x-api-key': _apiToken
-            });
+        var stability = await isConnectedToInternet();
+        if (stability) {
+          final response = await http.post("$baseURL/api/Authenticate/login",
+              body: json.encode(
+                {"Username": username, "Password": password},
+              ),
+              headers: {
+                'Content-type': 'application/json',
+                'x-api-key': _apiToken
+              }).timeout(
+              Duration(
+                seconds: 60,
+              ), onTimeout: () {
+            return;
+          });
 
-        var decodedRes = json.decode(response.body);
-        
-        print("token is :${decodedRes["token"]}");
-        if (decodedRes["message"] == "Success : ") {
-          user.userToken = decodedRes["token"];
-          user.id = decodedRes["userData"]["id"];
-          user.userID = decodedRes["userData"]["userName"];
-          user.name = decodedRes["userData"]["userName1"];
-          user.userJob = decodedRes["userData"]["userJob"];
-          user.email = decodedRes["userData"]["email"];
-          user.phoneNum = decodedRes["userData"]["phoneNumber"];
-          user.userType = decodedRes["userData"]["userType"];
+          var decodedRes = json.decode(response.body);
 
-          user.userSiteId = decodedRes["companyData"]["siteId"] as int;
-
-          user.userShiftId = decodedRes["userData"]["shiftId"];
-          user.userImage = "$baseURL/${decodedRes["userData"]["userImage"]}";
-
-          changedPassword = decodedRes["userData"]["changedPassword"] as bool;
-
-          siteName = decodedRes["companyData"]["siteName"];
-
-          var companyId = decodedRes["companyData"]["id"];
-
-          var msg = await Provider.of<CompanyData>(context, listen: false)
-              .getCompanyProfileApi(companyId, user.userToken,context);
-
-          if (msg == "Success") {
-            print("login -------------- ${user.userSiteId} ");
-            print("changedPassword -------------- $changedPassword ");
-         
-            SharedPreferences prefs = await SharedPreferences.getInstance();
-            String comImageFilePath = await _fileFromImageUrl(
-                "$baseURL/${decodedRes["companyData"]["logo"]}", "CompanyLogo");
-            String userImage = await _fileFromImageUrl(
-                "$baseURL/${decodedRes["userData"]["userImage"]}", "userImage");
-
-            print(comImageFilePath);
-     print(userImage);
-            List<String> userData = [
-              user.name,
-              user.userJob,
-              userImage,
-              decodedRes["companyData"]["nameAr"],
-              comImageFilePath
-            ];
-            prefs.setStringList("allUserData", userData);
-
-            loggedIn = true;
-
-            notifyListeners();
-            return user.userType;
+          print("token is :${decodedRes["token"]}");
+          if (decodedRes["message"] == "Success : ") {
+            user.userToken = decodedRes["token"];
+            user.id = decodedRes["userData"]["id"];
+            user.userID = decodedRes["userData"]["userName"];
+            user.name = decodedRes["userData"]["userName1"];
+            user.userJob = decodedRes["userData"]["userJob"];
+            user.email = decodedRes["userData"]["email"];
+            user.phoneNum = decodedRes["userData"]["phoneNumber"];
+            user.userType = decodedRes["userData"]["userType"];
+            user.userSiteId = decodedRes["companyData"]["siteId"] as int;
+            user.userShiftId = decodedRes["userData"]["shiftId"];
+            user.userImage = "$baseURL/${decodedRes["userData"]["userImage"]}";
+            changedPassword = decodedRes["userData"]["changedPassword"] as bool;
+            siteName = decodedRes["companyData"]["siteName"];
+            var companyId = decodedRes["companyData"]["id"];
+            var msg = await Provider.of<CompanyData>(context, listen: false)
+                .getCompanyProfileApi(companyId, user.userToken, context);
+            if (msg == "Success") {
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              String comImageFilePath = await _fileFromImageUrl(
+                  "$baseURL/${decodedRes["companyData"]["logo"]}",
+                  "CompanyLogo");
+              String userImage = await _fileFromImageUrl(
+                  "$baseURL/${decodedRes["userData"]["userImage"]}",
+                  "userImage");
+              List<String> userData = [
+                user.name,
+                user.userJob,
+                userImage,
+                decodedRes["companyData"]["nameAr"],
+                comImageFilePath
+              ];
+              prefs.setStringList("allUserData", userData);
+              loggedIn = true;
+              notifyListeners();
+              return user.userType;
+            }
+          } else if (decodedRes["message"] ==
+              "Failed : user name and password not match ") {
+            return -2;
+          } else if (decodedRes["message"] ==
+              "Fail : This Company is suspended") {
+            return -4;
           }
-        } else if (decodedRes["message"] ==
-            "Failed : user name and password not match ") {
-          return -2;
-        } else if (decodedRes["message"] ==
-            "Fail : This Company is suspended") {
-          return -4;
+        } else if (!stability) {
+          return -5;
         }
       } catch (e) {
         print(e);
@@ -512,7 +510,8 @@ notifyListeners();
     if (Platform.isIOS) {
       if (enabled) {
         bool isMock = await detectJailBreak();
-        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
+        bool isEmulator =
+            await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
         if (!isMock && !isEmulator) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
@@ -531,7 +530,8 @@ notifyListeners();
     } else {
       if (enabled) {
         bool isMockLocation = await TrustLocation.isMockLocation;
-                        bool isEmulator= await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
+        bool isEmulator =
+            await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
         if (!isMockLocation && !isEmulator) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
