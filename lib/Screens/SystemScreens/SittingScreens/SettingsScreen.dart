@@ -87,7 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             icon: Icons.location_on,
                             onTap: () async {
                               var bool = await userDataProvider
-                                  .isConnectedToInternet();
+                                  .isConnectedToInternet("www.google.com");
                               if (bool) {
                                 Navigator.of(context).push(
                                   new MaterialPageRoute(
@@ -110,7 +110,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             icon: Icons.alarm,
                             onTap: () async {
                               var bool = await userDataProvider
-                                  .isConnectedToInternet();
+                                  .isConnectedToInternet("www.google.com");
                               if (bool) {
                                 Navigator.of(context).push(
                                   new MaterialPageRoute(
@@ -133,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             icon: Icons.person,
                             onTap: () async {
                               var bool = await userDataProvider
-                                  .isConnectedToInternet();
+                                  .isConnectedToInternet("www.google.com");
                               if (bool) {
                                 Provider.of<SiteData>(context, listen: false)
                                     .setSiteValue("كل المواقع");
@@ -193,7 +193,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             icon: Icons.calendar_today_rounded,
                             onTap: () async {
                               var bool = await userDataProvider
-                                  .isConnectedToInternet();
+                                  .isConnectedToInternet("www.google.com");
                               if (bool) {
                                 showDialog(
                                     context: context,
