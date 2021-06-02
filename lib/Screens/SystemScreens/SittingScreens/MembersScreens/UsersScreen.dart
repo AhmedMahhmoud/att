@@ -164,6 +164,9 @@ class RoundedSearchBar extends StatelessWidget {
                                                     .forEach((element) {
                                                   if (element.shiftId ==
                                                       prov.currentShiftID) {
+                                                    print(
+                                                        "element id :${element.shiftId}");
+
                                                     finalTest.add(element);
                                                   }
                                                   Provider.of<MemberData>(
@@ -937,6 +940,17 @@ class _MemberTileState extends State<MemberTile> {
     return -1;
   }
 
+  String getShiftName() {
+    var list = Provider.of<ShiftsData>(context, listen: false).shiftsList;
+    int index = list.length;
+    for (int i = 0; i < index; i++) {
+      if (list[i].shiftId == widget.user.shiftId) {
+        return list[i].shiftName;
+      }
+    }
+    return "";
+  }
+
   int getShiftListIndex(int shiftId) {
     var list = Provider.of<ShiftsData>(context, listen: false).shiftsList;
     int index = list.length;
@@ -972,6 +986,7 @@ class _MemberTileState extends State<MemberTile> {
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       child: InkWell(
         onTap: () {
+          print(widget.user.shiftId);
           showUserDetails(widget.user);
         },
         child: Card(
@@ -1065,6 +1080,7 @@ class _MemberTileState extends State<MemberTile> {
         context: context,
         builder: (BuildContext context) {
           return GestureDetector(
+            onTap: () => print(member.shiftId),
             child: Dialog(
                 shape: RoundedRectangleBorder(
                     borderRadius:
@@ -1178,12 +1194,8 @@ class _MemberTileState extends State<MemberTile> {
                                           height: 10.0.h,
                                         ),
                                         UserDataField(
-                                          icon: Icons.query_builder,
-                                          text: Provider.of<ShiftsData>(context,
-                                                  listen: true)
-                                              .shiftsList[shiftId]
-                                              .shiftName,
-                                        )
+                                            icon: Icons.query_builder,
+                                            text: getShiftName())
                                       ],
                                     ),
                                   ),

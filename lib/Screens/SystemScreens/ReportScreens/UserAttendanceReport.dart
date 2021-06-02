@@ -96,14 +96,14 @@ class _UserAttendanceReportScreenState
     if (userProvider.user.userType == 2) {
       siteId = userProvider.user.userSiteId;
       siteData = await Provider.of<SiteData>(context, listen: false)
-          .getSpecificSite(siteId, userProvider.user.userToken,context);
+          .getSpecificSite(siteId, userProvider.user.userToken, context);
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
+          .getAllSiteMembers(siteId, userProvider.user.userToken, context);
     } else {
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
-                comProvider.com.id, userProvider.user.userToken,context)
+                comProvider.com.id, userProvider.user.userToken, context)
             .then((value) async {
           print("Got Sites");
         });
@@ -111,7 +111,7 @@ class _UserAttendanceReportScreenState
       siteId = Provider.of<SiteData>(context, listen: false).sitesList[0].id;
 
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
+          .getAllSiteMembers(siteId, userProvider.user.userToken, context);
     }
   }
 
@@ -128,7 +128,7 @@ class _UserAttendanceReportScreenState
 
   int siteId = 0;
   int siteIdIndex = 0;
-final focusNode = FocusNode();
+  final focusNode = FocusNode();
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
@@ -138,10 +138,11 @@ final focusNode = FocusNode();
         return WillPopScope(
           onWillPop: onWillPop,
           child: GestureDetector(
-            onTap: (){
-                           print(_nameController.text);
-                  _nameController.text == ""?FocusScope.of(context).unfocus():
-SystemChannels.textInput.invokeMethod('TextInput.hide');
+            onTap: () {
+              print(_nameController.text);
+              _nameController.text == ""
+                  ? FocusScope.of(context).unfocus()
+                  : SystemChannels.textInput.invokeMethod('TextInput.hide');
             },
             child: Scaffold(
               backgroundColor: Colors.white,
@@ -316,7 +317,8 @@ SystemChannels.textInput.invokeMethod('TextInput.hide');
                                                                     userToken,
                                                                     selectedId,
                                                                     dateFromString,
-                                                                    dateToString,context);
+                                                                    dateToString,
+                                                                    context);
                                                           }
                                                         }
                                                       },
@@ -415,7 +417,8 @@ SystemChannels.textInput.invokeMethod('TextInput.hide');
                                                                       listen:
                                                                           false)
                                                                   .user
-                                                                  .userToken,context);
+                                                                  .userToken,
+                                                              context);
                                                       setState(() {});
                                                     }
                                                     print(value);
@@ -438,7 +441,6 @@ SystemChannels.textInput.invokeMethod('TextInput.hide');
                                             child: searchTextField =
                                                 AutoCompleteTextField<Member>(
                                               key: key,
-                                       
                                               clearOnSubmit: false,
                                               controller: _nameController,
                                               suggestions:
@@ -502,7 +504,8 @@ SystemChannels.textInput.invokeMethod('TextInput.hide');
                                                           userToken,
                                                           item.id,
                                                           dateFromString,
-                                                          dateToString,context);
+                                                          dateToString,
+                                                          context);
                                                 }
                                               },
                                               itemBuilder: (context, item) {
@@ -579,7 +582,6 @@ SystemChannels.textInput.invokeMethod('TextInput.hide');
                                         ),
                                         _nameController.text != ""
                                             ? Expanded(
-                                              
                                                 child: FutureBuilder(
                                                     future: Provider.of<
                                                                 ReportsData>(

@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:connectivity/connectivity.dart';
-import 'package:device_info/device_info.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:flutter_is_emulator/flutter_is_emulator.dart';
+
+
 import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -81,11 +82,11 @@ class UserData with ChangeNotifier {
 
     if (connectivityResult != ConnectivityResult.none) {
       try {
-        if (await isConnectedToInternet("www.tamauzeds.com") == false) {
-          return -3;
-        }
         var stability = await isConnectedToInternet("www.google.com");
         if (stability) {
+          if (await isConnectedToInternet("www.tamauzeds.com") == false) {
+            return -3;
+          }
           final response = await http.post("$baseURL/api/Authenticate/login",
               body: json.encode(
                 {"Username": username, "Password": password},
@@ -513,9 +514,9 @@ class UserData with ChangeNotifier {
     if (Platform.isIOS) {
       if (enabled) {
         bool isMock = await detectJailBreak();
-        bool isEmulator =
-            await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
-        if (!isMock && !isEmulator) {
+       
+          
+        if (!isMock ) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {
@@ -533,9 +534,9 @@ class UserData with ChangeNotifier {
     } else {
       if (enabled) {
         bool isMockLocation = await TrustLocation.isMockLocation;
-        bool isEmulator =
-            await FlutterIsEmulator.isDeviceAnEmulatorOrASimulator;
-        if (!isMockLocation && !isEmulator) {
+     
+         
+        if (!isMockLocation ) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {
