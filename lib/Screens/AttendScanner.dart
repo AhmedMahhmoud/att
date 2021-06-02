@@ -9,6 +9,7 @@ import 'package:qr_users/Screens/SystemScreens/SystemGateScreens/NavScreenPartTw
 import 'package:qr_users/services/user_data.dart';
 import 'package:qr_users/widgets/RoundedAlert.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:qr_users/widgets/headers.dart';
 
 const frontCamera = 'FRONT CAMERA';
 
@@ -31,11 +32,15 @@ class _ScanPageState extends State<ScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[     
-          Expanded(child: _buildQrView(context)),  InkWell(onTap: ()=>Navigator.pop(context),child: Container(color: Colors.orange,child: Icon(Icons.arrow_back),height: 50.h,width: MediaQuery.of(context).size.width,))
-          
-   
+      body: Stack(
+        children: [
+          Column(
+            children: <Widget>[Expanded(child: _buildQrView(context))],
+          ),
+          Positioned(
+              child: Header(
+            nav: false,
+          ))
         ],
       ),
     );

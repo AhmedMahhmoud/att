@@ -214,8 +214,9 @@ class Header extends StatelessWidget {
             height: 50.h,
             child: InkWell(
               onTap: () {
-                print("s");
-                Scaffold.of(context).openDrawer();
+                nav == false
+                    ? Navigator.pop(context)
+                    : Scaffold.of(context).openDrawer();
               },
               child: Padding(
                 padding: Platform.isIOS

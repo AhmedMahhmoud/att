@@ -81,7 +81,7 @@ class UserData with ChangeNotifier {
 
     if (connectivityResult != ConnectivityResult.none) {
       try {
-        var stability = await isConnectedToInternet("www.cloudflare.com");
+        var stability = await isConnectedToInternet("www.google.com");
         if (stability) {
           if (await isConnectedToInternet("www.tamauzeds.com") == false) {
             return -3;
