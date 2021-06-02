@@ -492,8 +492,8 @@ class RoundedAlertOkOnly extends StatelessWidget {
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0)), //this right here
         child: Container(
-          height: 200,
-          width: 250,
+          height: 200.h,
+          width: 250.w,
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
@@ -503,7 +503,7 @@ class RoundedAlertOkOnly extends StatelessWidget {
                     children: <Widget>[
                       Center(
                           child: Container(
-                        height: 20,
+                        height: 20.h,
                         child: AutoSizeText(
                           title,
                           maxLines: 1,
@@ -514,11 +514,11 @@ class RoundedAlertOkOnly extends StatelessWidget {
                         ),
                       )),
                       SizedBox(
-                        height: 15,
+                        height: 15.h,
                       ),
                       Center(
                         child: Container(
-                          height: 20,
+                          height: 20.h,
                           child: AutoSizeText(
                             content,
                             maxLines: 1,

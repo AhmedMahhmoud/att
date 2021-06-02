@@ -133,7 +133,7 @@ class _SplashScreenState extends State<SplashScreen>
               await getUserData();
               Navigator.of(context).pushReplacement(new MaterialPageRoute(
                   builder: (context) => ErrorScreen(
-                      "الأنترنت ضعيف \nبرجاء اعادة المحاولة", true)));
+                      "لا يوجد اتصال بالانترنت\nبرجاء اعادة المحاولة", true)));
             } else if (value == -2) {
               Navigator.of(context).pushReplacement(
                   new MaterialPageRoute(builder: (context) => LoginScreen()));

@@ -7,7 +7,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-
 import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -82,7 +81,7 @@ class UserData with ChangeNotifier {
 
     if (connectivityResult != ConnectivityResult.none) {
       try {
-        var stability = await isConnectedToInternet("www.google.com");
+        var stability = await isConnectedToInternet("www.cloudflare.com");
         if (stability) {
           if (await isConnectedToInternet("www.tamauzeds.com") == false) {
             return -3;
@@ -514,9 +513,8 @@ class UserData with ChangeNotifier {
     if (Platform.isIOS) {
       if (enabled) {
         bool isMock = await detectJailBreak();
-       
-          
-        if (!isMock ) {
+
+        if (!isMock) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {
@@ -534,9 +532,8 @@ class UserData with ChangeNotifier {
     } else {
       if (enabled) {
         bool isMockLocation = await TrustLocation.isMockLocation;
-     
-         
-        if (!isMockLocation ) {
+
+        if (!isMockLocation) {
           await Geolocator.getCurrentPosition(
                   desiredAccuracy: LocationAccuracy.best)
               .then((Position position) {

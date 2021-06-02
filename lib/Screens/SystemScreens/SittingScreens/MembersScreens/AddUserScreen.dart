@@ -68,7 +68,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
       print(Provider.of<SiteData>(context, listen: false).dropDownSitesIndex);
       Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
           Provider.of<SiteData>(context, listen: false).sitesList[siteId].id,
-          true);
+          false);
     }
   }
 
@@ -95,7 +95,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
       print("edit screen");
       edit = true;
       await Provider.of<ShiftsData>(context, listen: false)
-          .findMatchingShifts(getSiteIdByShiftId(widget.member.shiftId), true);
+          .findMatchingShifts(getSiteIdByShiftId(widget.member.shiftId), false);
 
       shiftId = getShiftListIndex(widget.member.shiftId);
       siteId = getSiteListIndex(shiftId);
@@ -107,7 +107,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
       setState(() {});
     } else {
       await Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
-          Provider.of<SiteData>(context, listen: false).sitesList[0].id, true);
+          Provider.of<SiteData>(context, listen: false).sitesList[0].id, false);
     }
   }
 
@@ -558,7 +558,7 @@ class _AddUserScreenState extends State<AddUserScreen> {
                                                             listen: false)
                                                         .sitesList[siteId]
                                                         .id,
-                                                    true);
+                                                    false);
                                             setState(() {
                                               shiftId = 0;
                                             });

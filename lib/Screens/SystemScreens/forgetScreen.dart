@@ -768,7 +768,7 @@ class _ForgetSetPasswordState extends State<ForgetSetPassword> {
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  title: 'الأنترنت ضعيف',
+                  title: 'لا يوجد اتصال بالانترنت',
                   content: "برجاء المحاولة مرة اخرى");
             }).then((value) {
           setState(() {

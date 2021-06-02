@@ -375,7 +375,7 @@ class _SitesScreenState extends State<SitesScreen> {
               floatingActionButton: FloatingActionButton(
                 elevation: 3,
                 tooltip: "اضافة موقع",
-                backgroundColor: Colors.transparent,
+                backgroundColor: Colors.orange[600],
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -389,16 +389,10 @@ class _SitesScreenState extends State<SitesScreen> {
                             0)),
                   );
                 },
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      color: Colors.orange[600]),
-                  child: Center(
-                      child: Icon(
-                    Icons.add_location_alt,
-                    color: Colors.black,
-                    size: ScreenUtil().setSp(30, allowFontScalingSelf: true),
-                  )),
+                child: Icon(
+                  Icons.add_location_alt,
+                  color: Colors.black,
+                  size: ScreenUtil().setSp(30, allowFontScalingSelf: true),
                 ),
               )));
     });

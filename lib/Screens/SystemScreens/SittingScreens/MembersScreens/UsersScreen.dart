@@ -824,7 +824,13 @@ class _UsersScreenState extends State<UsersScreen> {
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.startFloat,
               floatingActionButton: FloatingActionButton(
-                backgroundColor: Colors.transparent,
+                tooltip: "اضافة مستخدم",
+                child: Icon(
+                  Icons.person_add,
+                  color: Colors.black,
+                  size: 30,
+                ),
+                backgroundColor: Colors.orange[600],
                 onPressed: () {
                   Navigator.push(
                       context,
@@ -832,19 +838,6 @@ class _UsersScreenState extends State<UsersScreen> {
                           builder: (context) =>
                               AddUserScreen(Member(), 0, false, "", "")));
                 },
-                child: Container(
-                  width: 60.w,
-                  height: 60.h,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      color: Colors.orange),
-                  child: Center(
-                      child: Icon(
-                    Icons.person_add,
-                    color: Colors.black,
-                    size: 30,
-                  )),
-                ),
               )),
         ),
       );

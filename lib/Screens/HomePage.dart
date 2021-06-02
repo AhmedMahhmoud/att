@@ -22,6 +22,20 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+Future<bool> isConnectedToInternet(String url) async {
+  try {
+    final result = await InternetAddress.lookup(url);
+    if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+      print('connected');
+      return true;
+    }
+  } on SocketException catch (_) {
+    print('not connected');
+    return false;
+  }
+  return false;
+}
+
 class _HomePageState extends State<HomePage> {
   DateTime currentBackPressTime;
   @override

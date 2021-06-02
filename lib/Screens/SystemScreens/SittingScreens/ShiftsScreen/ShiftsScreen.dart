@@ -147,287 +147,304 @@ class _ShiftsScreenState extends State<ShiftsScreen> {
       return WillPopScope(
         onWillPop: onWillPop,
         child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Container(
-            child: Stack(
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Header(nav: false),
+            backgroundColor: Colors.white,
+            body: Container(
+              child: Stack(
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Header(nav: false),
 
-                    ///Title
-                    Directionality(
-                      textDirection: ui.TextDirection.rtl,
-                      child: SmallDirectoriesHeader(
-                          Lottie.asset("resources/shiftLottie.json",
-                              repeat: false),
-                          "دليل المناوبات"),
-                    ),
+                      ///Title
+                      Directionality(
+                        textDirection: ui.TextDirection.rtl,
+                        child: SmallDirectoriesHeader(
+                            Lottie.asset("resources/shiftLottie.json",
+                                repeat: false),
+                            "دليل المناوبات"),
+                      ),
 
-                    Expanded(
-                      child: FutureBuilder(
-                          future: Provider.of<SiteData>(context).futureListener,
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return Container(
-                                color: Colors.white,
-                                child: Center(
-                                  child: Platform.isIOS
-                                      ? CupertinoActivityIndicator(
-                                          radius: 20,
-                                        )
-                                      : CircularProgressIndicator(
-                                          backgroundColor: Colors.white,
-                                          valueColor:
-                                              new AlwaysStoppedAnimation<Color>(
-                                                  Colors.orange),
-                                        ),
-                                ),
-                              );
-                            }
-                            return FutureBuilder(
-                                future: shiftsData.futureListener,
-                                builder: (context, snapshot) {
-                                  switch (snapshot.connectionState) {
-                                    case ConnectionState.waiting:
-                                      return Container(
-                                        color: Colors.white,
-                                        child: Center(
+                      Expanded(
+                        child: FutureBuilder(
+                            future:
+                                Provider.of<SiteData>(context).futureListener,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Container(
+                                  color: Colors.white,
+                                  child: Center(
+                                    child: Platform.isIOS
+                                        ? CupertinoActivityIndicator(
+                                            radius: 20,
+                                          )
+                                        : CircularProgressIndicator(
+                                            backgroundColor: Colors.white,
+                                            valueColor:
+                                                new AlwaysStoppedAnimation<
+                                                    Color>(Colors.orange),
+                                          ),
+                                  ),
+                                );
+                              }
+                              return FutureBuilder(
+                                  future: shiftsData.futureListener,
+                                  builder: (context, snapshot) {
+                                    switch (snapshot.connectionState) {
+                                      case ConnectionState.waiting:
+                                        return Container(
+                                          color: Colors.white,
+                                          child: Center(
+                                            child: CircularProgressIndicator(
+                                              backgroundColor: Colors.white,
+                                              valueColor:
+                                                  new AlwaysStoppedAnimation<
+                                                      Color>(Colors.orange),
+                                            ),
+                                          ),
+                                        );
+                                      case ConnectionState.done:
+                                        return Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 5),
+                                              child: SiteDropdown(
+                                                edit: true,
+                                                list: Provider.of<SiteData>(
+                                                        context,
+                                                        listen: true)
+                                                    .sitesList,
+                                                colour: Colors.white,
+                                                icon: Icons.location_on,
+                                                borderColor: Colors.black,
+                                                hint: "الموقع",
+                                                hintColor: Colors.black,
+                                                onChange: (value) async {
+                                                  // print()
+
+                                                  _onRefresh();
+                                                  siteId = getSiteName(value);
+                                                  Provider.of<SiteData>(context,
+                                                          listen: false)
+                                                      .setCurrentSiteName(
+                                                          value);
+                                                  print(
+                                                      "site name from monawbat $value");
+
+                                                  Provider.of<ShiftsData>(
+                                                          context,
+                                                          listen: false)
+                                                      .findMatchingShifts(
+                                                          Provider.of<SiteData>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .sitesList[siteId]
+                                                              .id,
+                                                          false);
+                                                },
+                                                selectedvalue:
+                                                    Provider.of<SiteData>(
+                                                            context)
+                                                        .sitesList[siteId]
+                                                        .name,
+                                                textColor: Colors.orange,
+                                              ),
+                                            ),
+                                            Expanded(
+                                                child: shiftsData
+                                                            .shiftsBySite[0]
+                                                            .shiftStartTime !=
+                                                        -1
+                                                    ? SmartRefresher(
+                                                        onRefresh: _onRefresh,
+                                                        controller:
+                                                            refreshController,
+                                                        enablePullDown: true,
+                                                        header:
+                                                            WaterDropMaterialHeader(
+                                                          color: Colors.white,
+                                                          backgroundColor:
+                                                              Colors.orange,
+                                                        ),
+                                                        child: isLoading
+                                                            ? Center(
+                                                                child:
+                                                                    CircularProgressIndicator(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  valueColor: new AlwaysStoppedAnimation<
+                                                                          Color>(
+                                                                      Colors
+                                                                          .orange),
+                                                                ),
+                                                              )
+                                                            : ListView.builder(
+                                                                itemCount:
+                                                                    shiftsData
+                                                                        .shiftsBySite
+                                                                        .length,
+                                                                itemBuilder:
+                                                                    (BuildContext
+                                                                            context,
+                                                                        int index) {
+                                                                  return ShiftTile(
+                                                                    siteName: shiftsData
+                                                                        .shiftsBySite[
+                                                                            index]
+                                                                        .shiftName,
+                                                                    siteIndex:
+                                                                        siteId,
+                                                                    index:
+                                                                        index,
+                                                                    shift: shiftsData
+                                                                            .shiftsBySite[
+                                                                        index],
+                                                                    onTapDelete:
+                                                                        () {
+                                                                      var token = Provider.of<UserData>(
+                                                                              context,
+                                                                              listen: false)
+                                                                          .user
+                                                                          .userToken;
+                                                                      return showDialog(
+                                                                          context:
+                                                                              context,
+                                                                          builder:
+                                                                              (BuildContext context) {
+                                                                            return RoundedAlert(
+                                                                                onPressed: () async {
+                                                                                  showDialog(
+                                                                                      context: context,
+                                                                                      builder: (BuildContext context) {
+                                                                                        return RoundedLoadingIndicator();
+                                                                                      });
+                                                                                  var msg = await shiftsData.deleteShift(shiftsData.shiftsBySite[index].shiftId, token, index, context);
+
+                                                                                  if (msg == "Success") {
+                                                                                    Navigator.pop(context);
+                                                                                    Fluttertoast.showToast(msg: "تم الحذف بنجاح", toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.green, gravity: ToastGravity.CENTER, textColor: Colors.white, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
+                                                                                  } else if (msg == "hasData") {
+                                                                                    Fluttertoast.showToast(msg: "خطأ في الحذف: هذه المناوبة تحتوي على مستخدمين. برجاء حذف المستخدمين اولا.", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.black, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
+                                                                                  } else if (msg == "failed") {
+                                                                                    Fluttertoast.showToast(msg: "خطأ في اثناء الحذف.", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.black, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
+                                                                                  } else if (msg == "noInternet") {
+                                                                                    Fluttertoast.showToast(msg: "خطأ في الحذف: لا يوجد اتصال بالانترنت.", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.black, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
+                                                                                  } else {
+                                                                                    Fluttertoast.showToast(msg: "خطأ في الحذف.", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.black, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
+                                                                                  }
+                                                                                  Navigator.pop(context);
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                title: 'إزالة مناوبة',
+                                                                                content: "هل تريد إزالة${shiftsData.shiftsBySite[index].shiftName} ؟");
+                                                                          });
+                                                                    },
+                                                                    onTapEdit:
+                                                                        () {
+                                                                      print(
+                                                                          "aaaaaaaaa :${shiftsData.shiftsBySite[index].shiftId}");
+                                                                      Navigator.of(
+                                                                              context)
+                                                                          .push(
+                                                                        new MaterialPageRoute(
+                                                                          builder: (context) => AddShiftScreen(
+                                                                              shiftsData.shiftsBySite[index],
+                                                                              index,
+                                                                              true,
+                                                                              siteId),
+                                                                        ),
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                }),
+                                                      )
+                                                    : Center(
+                                                        child: Container(
+                                                          height: 20,
+                                                          child: AutoSizeText(
+                                                            "لا يوجد مناوبات بهذا الموقع\nبرجاء اضافة مناوبة",
+                                                            maxLines: 1,
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                                height: 2,
+                                                                fontSize: ScreenUtil()
+                                                                    .setSp(16,
+                                                                        allowFontScalingSelf:
+                                                                            true),
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w700),
+                                                          ),
+                                                        ),
+                                                      )),
+                                          ],
+                                        );
+                                      default:
+                                        return Center(
                                           child: CircularProgressIndicator(
                                             backgroundColor: Colors.white,
                                             valueColor:
                                                 new AlwaysStoppedAnimation<
                                                     Color>(Colors.orange),
                                           ),
-                                        ),
-                                      );
-                                    case ConnectionState.done:
-                                      return Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 20, vertical: 5),
-                                            child: SiteDropdown(
-                                              edit: true,
-                                              list: Provider.of<SiteData>(
-                                                      context,
-                                                      listen: true)
-                                                  .sitesList,
-                                              colour: Colors.white,
-                                              icon: Icons.location_on,
-                                              borderColor: Colors.black,
-                                              hint: "الموقع",
-                                              hintColor: Colors.black,
-                                              onChange: (value) async {
-                                                // print()
-
-                                                _onRefresh();
-                                                siteId = getSiteName(value);
-                                                Provider.of<SiteData>(context,
-                                                        listen: false)
-                                                    .setCurrentSiteName(value);
-                                                print(
-                                                    "site name from monawbat $value");
-
-                                                Provider.of<ShiftsData>(context,
-                                                        listen: false)
-                                                    .findMatchingShifts(
-                                                        Provider.of<SiteData>(
-                                                                context,
-                                                                listen: false)
-                                                            .sitesList[siteId]
-                                                            .id,
-                                                        false);
-                                              },
-                                              selectedvalue:
-                                                  Provider.of<SiteData>(context)
-                                                      .sitesList[siteId]
-                                                      .name,
-                                              textColor: Colors.orange,
-                                            ),
-                                          ),
-                                          Expanded(
-                                              child:
-                                                  shiftsData.shiftsBySite[0]
-                                                              .shiftStartTime !=
-                                                          -1
-                                                      ? SmartRefresher(
-                                                          onRefresh: _onRefresh,
-                                                          controller:
-                                                              refreshController,
-                                                          enablePullDown: true,
-                                                          header:
-                                                              WaterDropMaterialHeader(
-                                                            color: Colors.white,
-                                                            backgroundColor:
-                                                                Colors.orange,
-                                                          ),
-                                                          child: isLoading
-                                                              ? Center(
-                                                                  child:
-                                                                      CircularProgressIndicator(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    valueColor: new AlwaysStoppedAnimation<
-                                                                            Color>(
-                                                                        Colors
-                                                                            .orange),
-                                                                  ),
-                                                                )
-                                                              : ListView
-                                                                  .builder(
-                                                                      itemCount: shiftsData
-                                                                          .shiftsBySite
-                                                                          .length,
-                                                                      itemBuilder:
-                                                                          (BuildContext context,
-                                                                              int index) {
-                                                                        return ShiftTile(
-                                                                          siteName: shiftsData
-                                                                              .shiftsBySite[index]
-                                                                              .shiftName,
-                                                                          siteIndex:
-                                                                              siteId,
-                                                                          index:
-                                                                              index,
-                                                                          shift:
-                                                                              shiftsData.shiftsBySite[index],
-                                                                          onTapDelete:
-                                                                              () {
-                                                                            var token =
-                                                                                Provider.of<UserData>(context, listen: false).user.userToken;
-                                                                            return showDialog(
-                                                                                context: context,
-                                                                                builder: (BuildContext context) {
-                                                                                  return RoundedAlert(
-                                                                                      onPressed: () async {
-                                                                                        showDialog(
-                                                                                            context: context,
-                                                                                            builder: (BuildContext context) {
-                                                                                              return RoundedLoadingIndicator();
-                                                                                            });
-                                                                                        var msg = await shiftsData.deleteShift(shiftsData.shiftsBySite[index].shiftId, token, index, context);
-
-                                                                                        if (msg == "Success") {
-                                                                                          Navigator.pop(context);
-                                                                                          Fluttertoast.showToast(msg: "تم الحذف بنجاح", toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.green, gravity: ToastGravity.CENTER, textColor: Colors.white, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-                                                                                        } else if (msg == "hasData") {
-                                                                                          Fluttertoast.showToast(msg: "خطأ في الحذف: هذه المناوبة تحتوي على مستخدمين. برجاء حذف المستخدمين اولا.", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.black, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-                                                                                        } else if (msg == "failed") {
-                                                                                          Fluttertoast.showToast(msg: "خطأ في اثناء الحذف.", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.black, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-                                                                                        } else if (msg == "noInternet") {
-                                                                                          Fluttertoast.showToast(msg: "خطأ في الحذف: لا يوجد اتصال بالانترنت.", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.black, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-                                                                                        } else {
-                                                                                          Fluttertoast.showToast(msg: "خطأ في الحذف.", gravity: ToastGravity.CENTER, toastLength: Toast.LENGTH_SHORT, timeInSecForIosWeb: 1, backgroundColor: Colors.red, textColor: Colors.black, fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-                                                                                        }
-                                                                                        Navigator.pop(context);
-                                                                                        Navigator.pop(context);
-                                                                                      },
-                                                                                      title: 'إزالة مناوبة',
-                                                                                      content: "هل تريد إزالة${shiftsData.shiftsBySite[index].shiftName} ؟");
-                                                                                });
-                                                                          },
-                                                                          onTapEdit:
-                                                                              () {
-                                                                            print("aaaaaaaaa :${shiftsData.shiftsBySite[index].shiftId}");
-                                                                            Navigator.of(context).push(
-                                                                              new MaterialPageRoute(
-                                                                                builder: (context) => AddShiftScreen(shiftsData.shiftsBySite[index], index, true, siteId),
-                                                                              ),
-                                                                            );
-                                                                          },
-                                                                        );
-                                                                      }),
-                                                        )
-                                                      : Center(
-                                                          child: Container(
-                                                            height: 20,
-                                                            child: AutoSizeText(
-                                                              "لا يوجد مناوبات بهذا الموقع\nبرجاء اضافة مناوبة",
-                                                              maxLines: 1,
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                              style: TextStyle(
-                                                                  height: 2,
-                                                                  fontSize: ScreenUtil().setSp(
-                                                                      16,
-                                                                      allowFontScalingSelf:
-                                                                          true),
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w700),
-                                                            ),
-                                                          ),
-                                                        )),
-                                        ],
-                                      );
-                                    default:
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          backgroundColor: Colors.white,
-                                          valueColor:
-                                              new AlwaysStoppedAnimation<Color>(
-                                                  Colors.orange),
-                                        ),
-                                      );
-                                  }
-                                });
-                          }),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  left: 5.0.w,
-                  top: 5.0.h,
-                  child: Container(
-                    width: 50.w,
-                    height: 50.h,
-                    child: InkWell(
-                      onTap: () {
-                        if (widget.isFromSites == 0) {
-                          Navigator.pop(context);
-                          return Future.value(false);
-                        } else {
-                          Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                  builder: (context) => NavScreenTwo(3)),
-                              (Route<dynamic> route) => false);
-                          return Future.value(false);
-                        }
-                      },
+                                        );
+                                    }
+                                  });
+                            }),
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    left: 5.0.w,
+                    top: 5.0.h,
+                    child: Container(
+                      width: 50.w,
+                      height: 50.h,
+                      child: InkWell(
+                        onTap: () {
+                          if (widget.isFromSites == 0) {
+                            Navigator.pop(context);
+                            return Future.value(false);
+                          } else {
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) => NavScreenTwo(3)),
+                                (Route<dynamic> route) => false);
+                            return Future.value(false);
+                          }
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
-          floatingActionButton: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        AddShiftScreen(Shift(), 0, false, siteId)),
-              );
-            },
-            child: Container(
-              width: 60.w,
-              height: 60.h,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: Colors.orange),
-              child: Center(
-                  child: Icon(
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.startFloat,
+            floatingActionButton: FloatingActionButton(
+              tooltip: "اضافة مناوبة",
+              splashColor: Colors.white,
+              elevation: 5,
+              backgroundColor: Colors.orange[600],
+              child: Icon(
                 Icons.alarm_add_sharp,
+                color: Colors.black,
                 size: ScreenUtil().setSp(30, allowFontScalingSelf: true),
-              )),
-            ),
-          ),
-        ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          AddShiftScreen(Shift(), 0, false, siteId)),
+                );
+              },
+            )),
       );
     });
   }

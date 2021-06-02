@@ -126,10 +126,10 @@ class _RoundedBorderDropdownState extends State<RoundedBorderDropdown> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-              color: widget.edit ? Colors.black : Colors.black12, width: 1)),
+      // decoration: BoxDecoration(
+      //     borderRadius: BorderRadius.circular(15),
+      //     border: Border.all(
+      //         color: widget.edit ? Colors.black : Colors.black12, width: 1)),
       height: 48.h,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -139,41 +139,41 @@ class _RoundedBorderDropdownState extends State<RoundedBorderDropdown> {
             Expanded(
               child: DropdownButton(
                 icon: Icon(
-              widget.icon,
-              color: Colors.orange,
+                  widget.icon,
+                  color: Colors.orange,
                 ),
                 elevation: 2,
                 isExpanded: true,
                 items: widget.list.map((String x) {
-              return DropdownMenuItem<String>(
-                  value: x,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 10),
-                          child: Container(
-                            height: 20,
-                            child: AutoSizeText(
-                              x,
-                              maxLines: 1,
-                              textAlign: TextAlign.end,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500),
+                  return DropdownMenuItem<String>(
+                      value: x,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Container(
+                                height: 20,
+                                child: AutoSizeText(
+                                  x,
+                                  maxLines: 1,
+                                  textAlign: TextAlign.end,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ));
+                        ],
+                      ));
                 }).toList(),
                 onChanged: (value) {
-              widget.onChange(value);
-              setState(() {
-                widget.selectedvalue = value;
-              });
+                  widget.onChange(value);
+                  setState(() {
+                    widget.selectedvalue = value;
+                  });
                 },
                 value: widget.selectedvalue,
               ),
@@ -217,10 +217,6 @@ class _ShiftsDropDownState extends State<ShiftsDropDown> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-              color: widget.edit ? Colors.black : Colors.black12, width: 1)),
       height: 48,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -230,40 +226,40 @@ class _ShiftsDropDownState extends State<ShiftsDropDown> {
             Expanded(
               child: DropdownButton(
                 icon: Icon(
-              widget.icon,
-              color: Colors.orange,
+                  widget.icon,
+                  color: Colors.orange,
                 ),
                 elevation: 2,
                 isExpanded: true,
                 items: widget.list.map((Shift x) {
-              return DropdownMenuItem<String>(
-                  value: x.shiftName,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 5),
-                          child: Container(
-                            height: 20,
-                            child: AutoSizeText(
-                              x.shiftName,
-                              maxLines: 1,
-                              textAlign: TextAlign.end,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500),
+                  return DropdownMenuItem<String>(
+                      value: x.shiftName,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 5),
+                              child: Container(
+                                height: 20,
+                                child: AutoSizeText(
+                                  x.shiftName,
+                                  maxLines: 1,
+                                  textAlign: TextAlign.end,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ));
+                        ],
+                      ));
                 }).toList(),
                 onChanged: (value) {
-              widget.onChange(value);
-              setState(() {
-                widget.selectedvalue = value;
-              });
+                  widget.onChange(value);
+                  setState(() {
+                    widget.selectedvalue = value;
+                  });
                 },
                 value: widget.selectedvalue,
               ),

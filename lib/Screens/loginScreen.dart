@@ -336,7 +336,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    title: "الأنترنت ضعيف",
+                    title: "لا يوجد اتصال بالانترنت",
                     content: "برجاء اعادة المحاولة مرة اخرى");
               }).then((value) {
             setState(() {

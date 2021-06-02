@@ -51,7 +51,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      message == "لا يوجد اتصال بالانترنت"
+                      message.toString().contains("لا يوجد اتصال بالانترنت")
                           ? Container(
                               child: Lottie.asset(
                                   "resources/21485-wifi-outline-icon.json",
@@ -163,7 +163,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
         } else if (value == -5) {
           setState(() {
             isLoading = false;
-            message = "الأنترنت ضعيف\nبرجاء المحاولة مرة اخرى";
+            message = "لا يوجد اتصال بالانترنت\nبرجاء المحاولة مرة اخرى";
           });
         } else if (value == -3) {
           setState(() {
