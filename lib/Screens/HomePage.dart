@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_jailbreak_detection/flutter_jailbreak_detection.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -20,6 +22,18 @@ var cron2;
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
+}
+
+Future<bool> detectJailBreak() async {
+  bool jaibreak;
+
+  try {
+    jaibreak = await FlutterJailbreakDetection.jailbroken;
+  } on PlatformException {
+    jaibreak = true;
+  }
+
+  return jaibreak;
 }
 
 Future<bool> isConnectedToInternet(String url) async {
@@ -42,10 +56,35 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final userDataProvider = Provider.of<UserData>(context, listen: false);
     SystemChrome.setEnabledSystemUIOverlays([]);
+
     return WillPopScope(
         onWillPop: onWillPop,
         child: GestureDetector(
-          onTap: () async {},
+          onTap: () async {
+            print(await detectJailBreak());
+            await Geolocator.getCurrentPosition(
+                    desiredAccuracy: LocationAccuracy.best)
+                .then((value) {
+              print(value.latitude);
+              print(value.longitude);
+              print(value.speed);
+              print(value.speedAccuracy);
+            });
+            print(await Geolocator.isLocationServiceEnabled());
+            // ignore: cancel_subscriptions
+            // try {
+            //   StreamSubscription<Position> positionStream =
+            //       Geolocator.getPositionStream().listen((Position position) {
+            //     print(position == null
+            //         ? 'Unknown'
+            //         : position.latitude.toString() +
+            //             ', ' +
+            //             position.longitude.toString());
+            //   });
+            // } catch (e) {
+            //   print(e);
+            // }
+          },
           child: Scaffold(
             backgroundColor: Colors.white,
             drawer: userDataProvider.user.userType == 0 ? DrawerI() : null,

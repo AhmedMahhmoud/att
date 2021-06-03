@@ -141,6 +141,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
         print(e);
       })).then((value) {
         if (value > 0) {
+          print("laaa");
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
@@ -153,6 +154,7 @@ class _ErrorScreenState extends State<ErrorScreen> {
                 builder: (context) => HomePage(),
               ));
         } else if (value == -1) {
+          print("mfeh");
           setState(() {
             isLoading = false;
             message = "لا يوجد اتصال بالانترنت";
@@ -161,11 +163,13 @@ class _ErrorScreenState extends State<ErrorScreen> {
           Navigator.of(context).pushReplacement(
               new MaterialPageRoute(builder: (context) => LoginScreen()));
         } else if (value == -5) {
+          print("mfeeesh net");
           setState(() {
             isLoading = false;
             message = "لا يوجد اتصال بالانترنت\nبرجاء المحاولة مرة اخرى";
           });
         } else if (value == -3) {
+          print("mfeesh net wlahi");
           setState(() {
             isLoading = false;
             message = "خطأ فى بيانات الحساب\nمن فضلك راجع مدير النظام";

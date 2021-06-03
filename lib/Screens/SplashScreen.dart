@@ -88,9 +88,7 @@ class _SplashScreenState extends State<SplashScreen>
 
               Navigator.pushReplacement(context,
                   MaterialPageRoute(builder: (context) {
-                return userData.cachedUserData.isNotEmpty
-                    ? ErrorScreen2(child: NavScreenTwo(0))
-                    : NavScreenTwo(0);
+                return NavScreenTwo(0);
                 // return ShowCaseWidget(
                 //   onStart: (index, key) {
                 //     log('onStart: $index, $key');
