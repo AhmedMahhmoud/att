@@ -100,7 +100,18 @@ const kTextFieldDecorationTime = InputDecoration(
     borderRadius: BorderRadius.all(Radius.circular(15.0)),
   ),
 );
-
+const kTextFieldTime = InputDecoration(
+  contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
+  hintText: 'Enter a value',
+  hintStyle: TextStyle(
+    color: Colors.grey,
+    fontSize: 11,
+    fontWeight: FontWeight.w500,
+  ),
+  fillColor: Colors.white,
+  filled: true,
+//  contentPadding: EdgeInsets.symmetric(),
+);
 const kTextFieldDecorationFromTO = InputDecoration(
   isDense: true,
   contentPadding: const EdgeInsets.symmetric(vertical: 10.0),
