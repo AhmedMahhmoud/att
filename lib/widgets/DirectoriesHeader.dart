@@ -71,6 +71,7 @@ class SmallDirectoriesHeader extends StatelessWidget {
           ),
           child: Container(
             width: 40.w,
+            height: 35,
             decoration: BoxDecoration(
               // image: DecorationImage(
               //   image: headerImage,
@@ -80,6 +81,9 @@ class SmallDirectoriesHeader extends StatelessWidget {
             ),
             child: lottie,
           ),
+        ),
+        SizedBox(
+          width: 2,
         ),
         Container(
           height: 30.h,

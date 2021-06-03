@@ -28,6 +28,8 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart'
     as intlPhone;
 import 'package:shimmer/shimmer.dart';
 
+import 'UserFullData.dart';
+
 class RoundedSearchBar extends StatelessWidget {
   final Function searchFun;
   final Function dropdownFun;
@@ -980,7 +982,18 @@ class _MemberTileState extends State<MemberTile> {
       child: InkWell(
         onTap: () {
           print(widget.user.shiftId);
-          showUserDetails(widget.user);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => UserFullDataScreen(
+                  onResetMac: widget.onResetMac,
+                  onTapDelete: widget.onTapDelete,
+                  onTapEdit: widget.onTapEdit,
+                  siteIndex: siteIndex,
+                  user: widget.user,
+                ),
+              ));
+          // showUserDetails(widget.user);
         },
         child: Card(
             elevation: 3,
@@ -1311,12 +1324,16 @@ class UserDataField extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 10.w),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: Colors.orange,
+            Padding(
+              padding: EdgeInsets.only(bottom: 3.h),
+              child: Icon(
+                icon,
+                color: Colors.orange,
+                size: 19,
+              ),
             ),
             SizedBox(
-              width: 10.w,
+              width: 15.w,
             ),
             Expanded(
                 child: Container(

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_users/Screens/ErrorScreen.dart';
 import 'package:qr_users/Screens/SystemScreens/NavSceen.dart';
 import 'package:qr_users/Screens/SystemScreens/SittingScreens//MembersScreens/UsersScreen.dart';
+import 'package:qr_users/Screens/SystemScreens/SittingScreens/CompanySettings.dart';
 import 'package:qr_users/Screens/SystemScreens/SittingScreens/ShiftsScreen/ShiftsScreen.dart';
 import 'package:qr_users/Screens/SystemScreens/SittingScreens/SitesScreens/SitesScreen.dart';
 import 'package:qr_users/Screens/SystemScreens/SystemGateScreens/NavScreenPartTwo.dart';
@@ -188,21 +189,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               print("الموظفين");
                             }),
                         ServiceTile(
-                            title: "ايام الاجازات",
-                            subTitle: "ادارة ايام الاجازات",
-                            icon: Icons.calendar_today_rounded,
+                            title: "اعدادات الشركة",
+                            subTitle: "ادارة اعدادات الشركة",
+                            icon: Icons.settings,
                             onTap: () async {
                               var bool = await userDataProvider
                                   .isConnectedToInternet("www.google.com");
                               if (bool) {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return RoundedLoadingIndicator();
-                                    });
-                                await getDaysOff();
-                                Navigator.pop(context);
-                                showVacationsDetails();
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CompanySettings(),
+                                    ));
                               } else {
                                 Navigator.of(context).push(
                                   new MaterialPageRoute(
@@ -221,177 +219,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ));
-  }
-
-  showVacationsDetails() async {
-    return showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0)), //this right here
-              child: Directionality(
-                textDirection: TextDirection.rtl,
-                child: Stack(
-                  children: [
-                    Container(
-                      height: 460.h,
-                      width: double.infinity,
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Column(
-                          children: [
-                            DirectoriesHeader(
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(40.0),
-                                child: Lottie.asset("resources/shifts.json",
-                                    repeat: false),
-                              ),
-                              "ايام الاجازات للشركة",
-                            ),
-                            SizedBox(
-                              height: 3.h,
-                            ),
-                            Expanded(
-                              child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  child: ListView.builder(
-                                      itemCount: Provider.of<DaysOffData>(
-                                              context,
-                                              listen: true)
-                                          .weak
-                                          .length,
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        print(index);
-                                        return CustomRow(
-                                            model: Provider.of<DaysOffData>(
-                                                    context,
-                                                    listen: true)
-                                                .weak[index],
-                                            onTap: () {
-                                              int i = 0;
-                                              if (Provider.of<DaysOffData>(
-                                                          context,
-                                                          listen: false)
-                                                      .weak[index]
-                                                      .isDayOff ==
-                                                  true) {
-                                                Provider.of<DaysOffData>(
-                                                        context,
-                                                        listen: false)
-                                                    .toggleDayOff(index);
-                                              } else {
-                                                Provider.of<DaysOffData>(
-                                                        context,
-                                                        listen: false)
-                                                    .weak
-                                                    .forEach((element) {
-                                                  if (element.isDayOff ==
-                                                      true) {
-                                                    i++;
-                                                  }
-                                                });
-
-                                                if (i < 2) {
-                                                  Provider.of<DaysOffData>(
-                                                          context,
-                                                          listen: false)
-                                                      .toggleDayOn(index);
-                                                } else {
-                                                  Fluttertoast.showToast(
-                                                      msg:
-                                                          "لا يمكن اخيار اكثر من يومين",
-                                                      gravity:
-                                                          ToastGravity.CENTER,
-                                                      toastLength:
-                                                          Toast.LENGTH_SHORT,
-                                                      timeInSecForIosWeb: 1,
-                                                      backgroundColor:
-                                                          Colors.red,
-                                                      textColor: Colors.black,
-                                                      fontSize: ScreenUtil().setSp(
-                                                          16,
-                                                          allowFontScalingSelf:
-                                                              true));
-                                                }
-                                              }
-                                            });
-                                      })),
-                            ),
-                            Container(
-                              width: 100.w,
-                              child: RounderButton("حفظ", () async {
-                                showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return RoundedLoadingIndicator();
-                                    });
-
-                                var userProvider = Provider.of<UserData>(
-                                    context,
-                                    listen: false);
-                                var comProvider = Provider.of<CompanyData>(
-                                    context,
-                                    listen: false);
-                                var msg = await Provider.of<DaysOffData>(
-                                        context,
-                                        listen: false)
-                                    .editDaysOffApi(comProvider.com.id,
-                                        userProvider.user.userToken, context);
-                                if (msg == "Success") {
-                                  Fluttertoast.showToast(
-                                      msg: "تم التعديل بنجاح",
-                                      gravity: ToastGravity.CENTER,
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.green,
-                                      textColor: Colors.white,
-                                      fontSize: ScreenUtil().setSp(16,
-                                          allowFontScalingSelf: true));
-                                  Navigator.pop(context);
-                                } else {
-                                  Fluttertoast.showToast(
-                                      msg: "خطا في التعديل",
-                                      gravity: ToastGravity.CENTER,
-                                      toastLength: Toast.LENGTH_SHORT,
-                                      timeInSecForIosWeb: 1,
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.black,
-                                      fontSize: ScreenUtil().setSp(16,
-                                          allowFontScalingSelf: true));
-                                }
-                                Navigator.pop(context);
-                              }),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 5.0.w,
-                      top: 5.0.h,
-                      child: Container(
-                        width: 50.w,
-                        height: 50.h,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.close,
-                            color: Colors.orange,
-                            size: ScreenUtil()
-                                .setSp(25, allowFontScalingSelf: true),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ));
-        });
   }
 
   Future<bool> onWillPop() {
