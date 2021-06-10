@@ -5,6 +5,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_face/image_face.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:qr_users/Screens/SystemScreens/SystemGateScreens/SytemScanner.dart';
@@ -118,10 +120,11 @@ class TakePictureScreenState extends State<CameraPicker>
                     '${DateTime.now()}.jpg',
                   );
 
-                  await _controller.takePicture(path);
-                  // File imgFile = File(img.path);
+                  await _controller.takePicture(path);                  // File imgFile = File(img.path);
                   // If the picture was taken, display it on a new screen.
                   File img = File(path);
+                  bool _has = await ImageFace.hasFace(img);
+                  print('this image ${_has ? 'has' : 'no'} face');
                   print(img.lengthSync());
 
                   final newPath = join(
@@ -131,15 +134,28 @@ class TakePictureScreenState extends State<CameraPicker>
 
                   await testCompressAndGetFile(file: img, targetPath: newPath);
                   print("=====Compressed==========");
-
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SystemScanPage(
-                          path: newPath,
-                        ),
-                      ));
-                  _controller.dispose();
+                  if (_has) {
+                    Fluttertoast.showToast(
+                        msg: "تم التعرف علي الوجة بنجاح",
+                        backgroundColor: Colors.green,
+                        gravity: ToastGravity.CENTER,
+                        toastLength: Toast.LENGTH_LONG);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SystemScanPage(
+                            path: newPath,
+                          ),
+                        ));
+                    _controller.dispose();
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: "برجاء تصوير وجهك بوضوح",
+                        backgroundColor: Colors.red,
+                        gravity: ToastGravity.CENTER,
+                        toastLength: Toast.LENGTH_LONG);
+                    Navigator.pop(context);
+                  }
                 } catch (e) {
                   print(e);
                 }

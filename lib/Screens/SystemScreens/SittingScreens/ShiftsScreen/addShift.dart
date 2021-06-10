@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:auto_size_text/auto_size_text.dart';
@@ -330,12 +331,31 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
                                                                 );
                                                               },
                                                             );
+                                                            MaterialLocalizations
+                                                                localizations =
+                                                                MaterialLocalizations
+                                                                    .of(context);
+                                                            String
+                                                                formattedTime =
+                                                                localizations
+                                                                    .formatTimeOfDay(
+                                                                        from,
+                                                                        alwaysUse24HourFormat:
+                                                                            false);
+
                                                             if (from != null) {
                                                               fromPicked = from;
                                                               setState(() {
-                                                                _timeInController
-                                                                        .text =
-                                                                    "${fromPicked.format(context).replaceAll(" ", "")}";
+                                                                if (Platform
+                                                                    .isIOS) {
+                                                                  _timeInController
+                                                                          .text =
+                                                                      formattedTime;
+                                                                } else {
+                                                                  _timeInController
+                                                                          .text =
+                                                                      "${fromPicked.format(context).replaceAll(" ", "")}";
+                                                                }
                                                               });
                                                             }
                                                           }
@@ -412,12 +432,30 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
                                                                 );
                                                               },
                                                             );
+                                                            MaterialLocalizations
+                                                                localizations =
+                                                                MaterialLocalizations
+                                                                    .of(context);
+                                                            String
+                                                                formattedTime2 =
+                                                                localizations
+                                                                    .formatTimeOfDay(
+                                                                        to,
+                                                                        alwaysUse24HourFormat:
+                                                                            false);
                                                             if (to != null) {
                                                               toPicked = to;
                                                               setState(() {
-                                                                _timeOutController
-                                                                        .text =
-                                                                    "${toPicked.format(context).replaceAll(" ", "")}";
+                                                                if (Platform
+                                                                    .isIOS) {
+                                                                  _timeOutController
+                                                                          .text =
+                                                                      formattedTime2;
+                                                                } else {
+                                                                  _timeOutController
+                                                                          .text =
+                                                                      "${toPicked.format(context).replaceAll(" ", "")}";
+                                                                }
                                                               });
                                                             }
                                                           }
@@ -501,6 +539,8 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
                               padding: const EdgeInsets.all(15),
                               child: RoundedButton(
                                 onPressed: () async {
+                                  print("d$fromPicked");
+
                                   // var startInt = int.parse(
                                   //     "${fromPicked.hour}${fromPicked.minute}");
                                   // var endInt = int.parse(
@@ -515,12 +555,16 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
                                   //     .format(context)
                                   //     .split(" ")[0]
                                   //     .replaceAll(":", ""));
+                                  DateTime now = DateTime.now();
+                                  TimeOfDay t = fromPicked;
+                                  TimeOfDay tt = toPicked;
+                                  final noww = new DateTime.now();
 
-                                  DateTime dateFrom = DateFormat.jm()
-                                      .parse(fromPicked.format(context));
+                                  DateTime dateFrom = DateTime(now.year,
+                                      now.month, now.day, t.hour, t.minute);
 
-                                  DateTime dateTo = DateFormat.jm()
-                                      .parse(toPicked.format(context));
+                                  DateTime dateTo = DateTime(now.year,
+                                      now.month, now.day, tt.hour, tt.minute);
 
                                   var startInt = int.parse(DateFormat("HH:mm")
                                       .format(dateFrom)
@@ -677,6 +721,11 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
     );
   }
 
+  TimeOfDay stringToTimeOfDay(String tod) {
+    final format = DateFormat.jm(); //"6:00 AM"
+    return TimeOfDay.fromDateTime(format.parse(tod));
+  }
+
   editShiftFun(int sS, int sE, int eS, int eE) async {
     showDialog(
         context: context,
@@ -697,7 +746,8 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
             shiftStartTime: int.parse(startString.replaceAll(":", "")),
             shiftEndTime: int.parse(endString.replaceAll(":", ""))),
         widget.id,
-        user.userToken,context);
+        user.userToken,
+        context);
 
     if (msg == "Success") {
       setState(() {
@@ -775,7 +825,8 @@ class _AddShiftScreenState extends State<AddShiftScreen> {
                 .id,
             shiftStartTime: int.parse(startString.replaceAll(":", "")),
             shiftEndTime: int.parse(endString.replaceAll(":", ""))),
-        user.userToken,context);
+        user.userToken,
+        context);
     Navigator.pop(context);
 
     if (msg == "Success") {

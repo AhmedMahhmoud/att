@@ -38,10 +38,11 @@ class _LateAbsenceScreenState extends State<LateAbsenceScreen> {
   TextEditingController _dateController = TextEditingController();
   int selectedDuration;
   var toDate;
-  var fromDate;
+  var fromDate;  
+  DateTime yesterday;
   Site siteData;
   String diff;
-  DateTime yesterday;
+
   void initState() {
     // TODO: implement initState
     super.initState();

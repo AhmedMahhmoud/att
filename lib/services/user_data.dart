@@ -25,6 +25,8 @@ import 'ShiftsData.dart';
 class UserData with ChangeNotifier {
   var changedWidget = Image.asset("resources/personicon.png");
   // Company com = Company(id: 0, logo: "", nameAr: "", nameEn: "");
+//   var cacheValCompanyIcon = "";
+// var companyDataArname="";
   String siteName;
   Position _currentPosition;
   bool changedPassword;
@@ -63,17 +65,17 @@ class UserData with ChangeNotifier {
     return false;
   }
 
-  Future<String> _fileFromImageUrl(String path, String name) async {
-    final response = await http.get(path);
+  // Future<String> _fileFromImageUrl(String path, String name) async {
+  //   final response = await http.get(path);
 
-    final documentDirectory = await getApplicationDocumentsDirectory();
+  //   final documentDirectory = await getApplicationDocumentsDirectory();
 
-    final file = File(join(documentDirectory.path, '$name.png'));
+  //   final file = File(join(documentDirectory.path, '$name.png'));
 
-    file.writeAsBytesSync(response.bodyBytes);
+  //   file.writeAsBytesSync(response.bodyBytes);
 
-    return file.path;
-  }
+  //   return file.path;
+  // }
 
   Future<int> loginPost(
       String username, String password, BuildContext context) async {
@@ -95,13 +97,13 @@ class UserData with ChangeNotifier {
                 'x-api-key': _apiToken
               }).timeout(
               Duration(
-                seconds: 60,
+                seconds: 40,
               ), onTimeout: () {
             return;
           });
 
           var decodedRes = json.decode(response.body);
-
+          print(response.body);
           print("token is :${decodedRes["token"]}");
           if (decodedRes["message"] == "Success : ") {
             user.userToken = decodedRes["token"];
@@ -117,17 +119,19 @@ class UserData with ChangeNotifier {
             user.userImage = "$baseURL/${decodedRes["userData"]["userImage"]}";
             changedPassword = decodedRes["userData"]["changedPassword"] as bool;
             siteName = decodedRes["companyData"]["siteName"];
+            // cacheValCompanyIcon = decodedRes["companyData"]["logo"];
+
             var companyId = decodedRes["companyData"]["id"];
+            print('com id :$companyId');
             var msg = await Provider.of<CompanyData>(context, listen: false)
                 .getCompanyProfileApi(companyId, user.userToken, context);
             if (msg == "Success") {
+              print("ana get b success");
               SharedPreferences prefs = await SharedPreferences.getInstance();
-              String comImageFilePath = await _fileFromImageUrl(
-                  "$baseURL/${decodedRes["companyData"]["logo"]}",
-                  "CompanyLogo");
-              String userImage = await _fileFromImageUrl(
-                  "$baseURL/${decodedRes["userData"]["userImage"]}",
-                  "userImage");
+              String comImageFilePath =
+                  "$baseURL/${decodedRes["companyData"]["logo"]}";
+              String userImage = user.userImage;
+
               List<String> userData = [
                 user.name,
                 user.userJob,
@@ -136,6 +140,8 @@ class UserData with ChangeNotifier {
                 comImageFilePath
               ];
               prefs.setStringList("allUserData", userData);
+              print(userData[2]);
+              print(userData[4]);
               loggedIn = true;
               notifyListeners();
               return user.userType;

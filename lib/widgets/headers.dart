@@ -511,7 +511,7 @@ class NewHeader extends StatelessWidget {
                           backgroundColor: Colors.white,
                           radius: 30,
                           child: Container(
-                            height: 70.h,
+                            height: 75.h,
                             width: 70.w,
                             decoration: BoxDecoration(
                               border: Border.all(
@@ -525,11 +525,25 @@ class NewHeader extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                             child: ClipRRect(
-                                borderRadius: BorderRadius.circular(75.0),
-                                child: Image.file(
-                                  File(cachedUserData[2]),
-                                  fit: BoxFit.fill,
-                                )),
+                              borderRadius: BorderRadius.circular(75.0),
+                              child: CachedNetworkImage(
+                                imageUrl: cachedUserData[2],
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Platform.isIOS
+                                    ? CupertinoActivityIndicator(
+                                        radius: 20,
+                                      )
+                                    : CircularProgressIndicator(
+                                        backgroundColor: Colors.white,
+                                        valueColor:
+                                            new AlwaysStoppedAnimation<Color>(
+                                                Colors.orange),
+                                      ),
+                                errorWidget: (context, url, error) =>
+                                    Provider.of<UserData>(context, listen: true)
+                                        .changedWidget,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -557,9 +571,21 @@ class NewHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(40),
                 child: Container(
                   decoration: BoxDecoration(color: Colors.black),
-                  child: Image.file(
-                    File(cachedUserData[4]),
+                  child: CachedNetworkImage(
+                    imageUrl: cachedUserData[4],
                     fit: BoxFit.cover,
+                    placeholder: (context, url) => Platform.isIOS
+                        ? CupertinoActivityIndicator(
+                            radius: 20,
+                          )
+                        : CircularProgressIndicator(
+                            backgroundColor: Colors.white,
+                            valueColor: new AlwaysStoppedAnimation<Color>(
+                                Colors.orange),
+                          ),
+                    errorWidget: (context, url, error) =>
+                        Provider.of<UserData>(context, listen: true)
+                            .changedWidget,
                   ),
                 )),
           ),

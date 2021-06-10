@@ -76,6 +76,9 @@ dependencies:
   connectivity: ^3.0.6
   shimmer: ^2.0.0
   animate_do: ^2.0.0
+  searchable_dropdown: ^1.1.3
+  image_face: ^1.1.0
+  # flutter_mobile_vision: ^0.1.4+1
 dev_dependencies:
   flutter_test:
     sdk: flutter

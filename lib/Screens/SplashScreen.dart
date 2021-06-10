@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_users/Screens/ChangePasswordScreen.dart';
 import 'package:qr_users/Screens/ErrorScreen.dart';
@@ -17,8 +19,9 @@ import 'package:qr_users/services/api.dart';
 import 'package:qr_users/services/user_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
+import 'package:path/path.dart' as p;
 import '../Screens/intro.dart';
+import 'package:http/http.dart' as http;
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -66,6 +69,18 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
+  Future<String> _fileFromImageUrl(String path, String name) async {
+    final response = await http.get(path);
+
+    final documentDirectory = await getApplicationDocumentsDirectory();
+
+    final file = File(p.join(documentDirectory.path, '$name.png'));
+
+    file.writeAsBytesSync(response.bodyBytes);
+
+    return file.path;
+  }
+
   AnimationController animationController;
   reverse(String userName, value) {
     //Reverse animation Function
@@ -73,6 +88,20 @@ class _SplashScreenState extends State<SplashScreen>
     setState(() {
       animationController.reverse();
       Timer(new Duration(milliseconds: 2000), () async {
+        // SharedPreferences prefs = await SharedPreferences.getInstance();
+        // String comImageFilePath = await _fileFromImageUrl(
+        //     userData.cacheValCompanyIcon, "CompanyLogo");
+        // String userImage =
+        //     await _fileFromImageUrl(userData.user.userImage, "userImage");
+
+        //     List<String> userd = [
+        //         userData.user.name,
+        //         userData.user.userJob,
+        //         userImage,
+        //         c["companyData"]["nameAr"],
+        //         comImageFilePath
+        //       ];
+        //       prefs.setStringList("allUserData", userd);
 //        checkSharedUserData();
         if (userName != "") {
           if (Provider.of<UserData>(context, listen: false).changedPassword ==

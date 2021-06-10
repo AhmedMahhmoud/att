@@ -961,9 +961,9 @@ class _MemberTileState extends State<MemberTile> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    shiftId = getShiftListIndex(widget.user.shiftId);
-    siteIndex = getSiteListIndex(shiftId);
 
+    // shiftId = getShiftListIndex(widget.user.shiftId);
+    // siteIndex = getSiteListIndex(shiftId);
     // Provider.of<ShiftsData>(context, listen: false).findMatchingShifts(
     //     Provider.of<SiteData>(context, listen: false)
     //         .sitesList[Provider.of<SiteData>(context, listen: false)
@@ -981,7 +981,8 @@ class _MemberTileState extends State<MemberTile> {
       padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 5),
       child: InkWell(
         onTap: () {
-          print(widget.user.shiftId);
+          shiftId = getShiftListIndex(widget.user.shiftId);
+          siteIndex = getSiteListIndex(shiftId);
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -1337,7 +1338,7 @@ class UserDataField extends StatelessWidget {
             ),
             Expanded(
                 child: Container(
-              height: 20,
+              height: 20.h,
               child: AutoSizeText(
                 text ?? "",
                 maxLines: 1,

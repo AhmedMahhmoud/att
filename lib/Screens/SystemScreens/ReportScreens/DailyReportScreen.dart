@@ -35,7 +35,6 @@ class DailyReportScreen extends StatefulWidget {
 class _DailyReportScreenState extends State<DailyReportScreen> {
   @override
   void initState() {
-
     super.initState();
     date = apiFormatter.format(DateTime.now());
     getData(siteId, date);
@@ -44,6 +43,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
     today = DateTime(now.year, now.month, now.day);
     selectedDate = DateTime(now.year, now.month, now.day);
   }
+
   int siteId = 0;
   Site siteData;
   final DateFormat apiFormatter = DateFormat('yyyy-MM-dd');
@@ -61,17 +61,17 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
     if (userProvider.user.userType == 2) {
       siteID = userProvider.user.userSiteId;
       siteData = await Provider.of<SiteData>(context, listen: false)
-          .getSpecificSite(siteID, userProvider.user.userToken,context);
-    } else {  
+          .getSpecificSite(siteID, userProvider.user.userToken, context);
+    } else {
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
-                comProvider.com.id, userProvider.user.userToken,context)
+                comProvider.com.id, userProvider.user.userToken, context)
             .then((value) {
           siteID = Provider.of<SiteData>(context, listen: false)
               .sitesList[siteIndex]
               .id;
-              print("SiteIndex $siteIndex");
+          print("SiteIndex $siteIndex");
         });
       } else {
         siteID = Provider.of<SiteData>(context, listen: false)
@@ -79,8 +79,8 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
             .id;
       }
     }
-    await Provider.of<ReportsData>(context, listen: false)
-        .getDailyReportUnits(userProvider.user.userToken, siteID, date,context);
+    await Provider.of<ReportsData>(context, listen: false).getDailyReportUnits(
+        userProvider.user.userToken, siteID, date, context);
   }
 
   int getSiteIndex(String siteName) {
@@ -103,7 +103,6 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
       return false;
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -141,8 +140,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                             ),
                             Container(
                                 child: FutureBuilder(
-                                    future: reportsData
-                                        .futureListener,
+                                    future: reportsData.futureListener,
                                     builder: (context, snapshot) {
                                       switch (snapshot.connectionState) {
                                         case ConnectionState.waiting:
@@ -185,9 +183,7 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                       ),
                       Expanded(
                         child: FutureBuilder(
-                            future:
-                             reportsData
-                                    .futureListener,
+                            future: reportsData.futureListener,
                             builder: (context, snapshot) {
                               switch (snapshot.connectionState) {
                                 case ConnectionState.waiting:
@@ -243,14 +239,15 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                                                         onChange:
                                                             (value) async {
                                                           var lastRec = siteId;
-                                                          siteId =
-                                                              getSiteIndex(value);
+                                                          siteId = getSiteIndex(
+                                                              value);
                                                           if (lastRec !=
                                                               siteId) {
                                                             setState(() {});
                                                             getData(
                                                                 siteId, date);
-                                                            print("call back value $value");
+                                                            print(
+                                                                "call back value $value");
                                                           }
                                                         },
                                                         selectedvalue: Provider
@@ -282,26 +279,24 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
 
                                                                 onChanged:
                                                                     (value) {
-                                                                 
-                                                                    if (value !=
-                                                                        date) {
-                                                                      date =
-                                                                          value;
-                                                                      selectedDateString =
-                                                                          date;
-                                                                      setState(
-                                                                          () {
-                                                                        selectedDate =
-                                                                            DateTime.parse(selectedDateString);
-                                                                      });
-                                                                      getData(
-                                                                          siteId,
-                                                                          date);
-                                                                    }
+                                                                  if (value !=
+                                                                      date) {
+                                                                    date =
+                                                                        value;
+                                                                    selectedDateString =
+                                                                        date;
+                                                                    setState(
+                                                                        () {
+                                                                      selectedDate =
+                                                                          DateTime.parse(
+                                                                              selectedDateString);
+                                                                    });
+                                                                    getData(
+                                                                        siteId,
+                                                                        date);
+                                                                  }
 
-                                                                    print(
-                                                                        value);
-                                                                  
+                                                                  print(value);
                                                                 },
                                                                 type:
                                                                     DateTimePickerType
@@ -371,19 +366,17 @@ class _DailyReportScreenState extends State<DailyReportScreen> {
                                                     initialValue:
                                                         selectedDateString,
                                                     onChanged: (value) {
-                                          
-                                                        if (value != date) {
-                                                          date = value;
-                                                          selectedDateString =
-                                                              date;
-                                                          setState(() {});
-                                                          getData(siteId, date);
-                                                        }
-                                                        selectedDate =
-                                                            DateTime.parse(
-                                                                selectedDateString);
-                                                        print(value);
-                                                      
+                                                      if (value != date) {
+                                                        date = value;
+                                                        selectedDateString =
+                                                            date;
+                                                        setState(() {});
+                                                        getData(siteId, date);
+                                                      }
+                                                      selectedDate =
+                                                          DateTime.parse(
+                                                              selectedDateString);
+                                                      print(value);
                                                     },
                                                     type:
                                                         DateTimePickerType.date,
@@ -585,12 +578,12 @@ class _DataTableRowState extends State<DataTableRow> {
     if (userProvider.user.userType == 2) {
       siteId = userProvider.user.userSiteId;
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
+          .getAllSiteMembers(siteId, userProvider.user.userToken, context);
     } else {
       if (Provider.of<SiteData>(context, listen: false).sitesList.isEmpty) {
         await Provider.of<SiteData>(context, listen: false)
             .getSitesByCompanyId(
-                comProvider.com.id, userProvider.user.userToken,context)
+                comProvider.com.id, userProvider.user.userToken, context)
             .then((value) async {
           print("Got Sites");
         });
@@ -598,7 +591,7 @@ class _DataTableRowState extends State<DataTableRow> {
       siteId = Provider.of<SiteData>(context, listen: false).sitesList[0].id;
 
       await Provider.of<MemberData>(context, listen: false)
-          .getAllSiteMembers(siteId, userProvider.user.userToken,context);
+          .getAllSiteMembers(siteId, userProvider.user.userToken, context);
     }
   }
 
@@ -630,7 +623,8 @@ class _DataTableRowState extends State<DataTableRow> {
                         userProvider.userToken,
                         widget.attendUnit.userId,
                         formatter.format(fromDate),
-                        formatter.format(toDate),context)
+                        formatter.format(toDate),
+                        context)
                     .then((value) {
                   print("value $value");
                   if (value == "Success") {
@@ -656,8 +650,8 @@ class _DataTableRowState extends State<DataTableRow> {
                     widget.attendUnit.userName,
                     maxLines: 1,
                     style: TextStyle(
-                        fontSize: ScreenUtil()
-                            .setSp(16, allowFontScalingSelf: true),
+                        fontSize:
+                            ScreenUtil().setSp(16, allowFontScalingSelf: true),
                         color: Colors.black),
                   ),
                 ),
@@ -796,7 +790,7 @@ class _DataTableRowState extends State<DataTableRow> {
                         if (widget.attendUnit.attendType == 1) {
                           showAttendByCameraDetails();
                         } else {
-print("mob");
+                          print("mob");
                         }
                       },
                       child: widget.attendUnit.timeOut != "-" ||
@@ -1133,6 +1127,102 @@ class DataTableEnd extends StatelessWidget {
   }
 }
 
+class DataTablePermessionHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Directionality(
+      textDirection: ui.TextDirection.rtl,
+      child: Container(
+          decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
+              )),
+          child: Row(
+            children: [
+              Container(
+                  width: 160.w,
+                  child: Container(
+                    padding: EdgeInsets.only(right: 10.w),
+                    height: 20,
+                    child: AutoSizeText(
+                      ' أسم المستخدم',
+                      maxLines: 1,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: ScreenUtil()
+                              .setSp(16, allowFontScalingSelf: true),
+                          color: Colors.black),
+                    ),
+                  )),
+              Expanded(
+                child: Row(
+                  children: [
+                    DataTableHeaderTitles("نوع الأذن"),
+                    DataTableHeaderTitles("التاريخ"),
+                    DataTableHeaderTitles("الوقت"),
+                    Expanded(
+                      flex: 0,
+                      child: Container(
+                        height: 50.h,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          )),
+    );
+  }
+}
+
+class DataTableVacationHeader extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        decoration: BoxDecoration(
+            color: Colors.orange,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            )),
+        child: Row(
+          children: [
+            Container(
+                width: 160.w,
+                child: Container(
+                  padding: EdgeInsets.only(right: 10.w),
+                  height: 20,
+                  child: AutoSizeText(
+                    ' أسم العطلة',
+                    maxLines: 1,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize:
+                            ScreenUtil().setSp(16, allowFontScalingSelf: true),
+                        color: Colors.black),
+                  ),
+                )),
+            Expanded(
+              child: Row(
+                children: [
+                  DataTableHeaderTitles("من"),
+                  DataTableHeaderTitles("إلى"),
+                  Expanded(
+                    flex: 0,
+                    child: Container(
+                      height: 50.h,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ));
+  }
+}
+
 class DataTableHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1166,13 +1256,13 @@ class DataTableHeader extends StatelessWidget {
                 child: Row(
                   children: [
                     DataTableHeaderTitles("التأخير"),
-                  DataTableHeaderTitles("حضور"),
-              DataTableHeaderTitles("انصراف"),
+                    DataTableHeaderTitles("حضور"),
+                    DataTableHeaderTitles("انصراف"),
                     Expanded(
                       flex: 1,
                       child: Container(
-                          height: 50.h,
-                       ),
+                        height: 50.h,
+                      ),
                     ),
                   ],
                 ),
@@ -1184,8 +1274,8 @@ class DataTableHeader extends StatelessWidget {
 }
 
 class DataTableHeaderTitles extends StatelessWidget {
- final String title;
-DataTableHeaderTitles(this.title);
+  final String title;
+  DataTableHeaderTitles(this.title);
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -1196,12 +1286,11 @@ DataTableHeaderTitles(this.title);
               child: Container(
             height: 20,
             child: AutoSizeText(
-         title   ,
+              title,
               maxLines: 1,
               style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: ScreenUtil()
-                      .setSp(16, allowFontScalingSelf: true),
+                  fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true),
                   color: Colors.black),
             ),
           ))),

@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_users/Screens/ErrorScreen.dart';
 import 'package:qr_users/Screens/SystemScreens/NavSceen.dart';
 import 'package:qr_users/Screens/SystemScreens/SittingScreens//MembersScreens/UsersScreen.dart';
-import 'package:qr_users/Screens/SystemScreens/SittingScreens/CompanySettings.dart';
+
 import 'package:qr_users/Screens/SystemScreens/SittingScreens/ShiftsScreen/ShiftsScreen.dart';
 import 'package:qr_users/Screens/SystemScreens/SittingScreens/SitesScreens/SitesScreen.dart';
 import 'package:qr_users/Screens/SystemScreens/SystemGateScreens/NavScreenPartTwo.dart';
@@ -19,6 +19,8 @@ import 'package:qr_users/services/user_data.dart';
 import 'package:qr_users/widgets/DirectoriesHeader.dart';
 import 'package:qr_users/widgets/roundedAlert.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'CompanySettings/MainCompanySettings.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -136,6 +138,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               var bool = await userDataProvider
                                   .isConnectedToInternet("www.google.com");
                               if (bool) {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return RoundedLoadingIndicator();
+                                    });
                                 Provider.of<SiteData>(context, listen: false)
                                     .setSiteValue("كل المواقع");
                                 Provider.of<SiteData>(context, listen: false)
