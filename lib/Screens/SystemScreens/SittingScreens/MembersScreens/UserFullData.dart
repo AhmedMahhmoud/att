@@ -10,15 +10,19 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_users/Screens/SystemScreens/SittingScreens/CompanySettings/MainCompanySettings.dart';
 import 'package:qr_users/Screens/SystemScreens/SittingScreens/CompanySettings/OutsideVacation.dart';
+import 'package:qr_users/Screens/SystemScreens/SittingScreens/CompanySettings/ReallocateUsers.dart';
 
 import 'package:qr_users/constants.dart';
+import 'package:qr_users/services/DaysOff.dart';
 import 'package:qr_users/services/MemberData.dart';
 import 'package:qr_users/services/ShiftsData.dart';
 import 'package:qr_users/services/Sites_data.dart';
+import 'package:qr_users/services/company.dart';
 import 'package:qr_users/services/user_data.dart';
 import 'package:qr_users/widgets/DirectoriesHeader.dart';
 import 'package:qr_users/widgets/headers.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:qr_users/widgets/roundedAlert.dart';
 import 'package:qr_users/widgets/roundedButton.dart';
 
 import 'UsersScreen.dart';
@@ -412,6 +416,71 @@ class _UserFullDataScreenState extends State<UserFullDataScreen>
                                           ),
                                         )
                                       ],
+                                    ),
+                                  ),
+                                ),
+                                Divider(),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 3),
+                                  child: InkWell(
+                                    onTap: () async {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return RoundedLoadingIndicator();
+                                          });
+                                      var userProvider = Provider.of<UserData>(
+                                          context,
+                                          listen: false);
+                                      var comProvider =
+                                          Provider.of<CompanyData>(context,
+                                              listen: false);
+                                      await Provider.of<DaysOffData>(context,
+                                              listen: false)
+                                          .getDaysOff(
+                                              comProvider.com.id,
+                                              userProvider.user.userToken,
+                                              context);
+                                      for (int i = 0; i < 7; i++) {
+                                        await Provider.of<DaysOffData>(context,
+                                                listen: false)
+                                            .setSiteAndShift(
+                                                i,
+                                                getShiftName(),
+                                                Provider.of<SiteData>(context,
+                                                        listen: false)
+                                                    .sitesList[widget.siteIndex]
+                                                    .name);
+                                      }
+                                      Navigator.pop(context);
+
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ReAllocateUsers(widget.user),
+                                          ));
+                                    },
+                                    child: Container(
+                                      alignment: Alignment.centerRight,
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text("جدولة المستخدم"),
+                                          Container(
+                                            width: 25.w,
+                                            height: 35.h,
+                                            child: Icon(
+                                              Icons.table_view,
+                                              color: Colors.orange,
+                                              size: 25,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
