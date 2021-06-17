@@ -121,14 +121,14 @@ class _ReAllocateUsersState extends State<ReAllocateUsers> {
                                     SmallDirectoriesHeader(
                                       Lottie.asset("resources/calender.json",
                                           repeat: false),
-                                      "جدولة المستخدمين",
+                                      "جدولة المناوبات",
                                     ),
                                   ],
                                 ),
                               ),
                               VacationCardHeader(
                                 header:
-                                    "جدولة المستخدم : ${widget.member.name} ",
+                                    "جدولة المناوبات للمستخدم : ${widget.member.name} ",
                               ),
                               Expanded(
                                   child: ListView.builder(

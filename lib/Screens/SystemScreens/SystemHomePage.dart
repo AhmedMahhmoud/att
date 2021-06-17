@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audio_cache.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:camera/camera.dart';
 import 'package:cron/cron.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +11,9 @@ import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:qr_users/MLmodule/db/database.dart';
+import 'package:qr_users/MLmodule/services/facenet.service.dart';
+import 'package:qr_users/MLmodule/services/ml_kit_service.dart';
 import 'package:qr_users/Screens/HomePage.dart';
 import 'package:qr_users/Screens/SystemScreens/NavSceen.dart';
 import 'package:qr_users/Screens/SystemScreens/SystemGateScreens/CameraPickerScreen.dart';
@@ -31,6 +35,7 @@ class SystemHomePage extends StatefulWidget {
 }
 
 class _SystemHomePageState extends State<SystemHomePage> {
+  CameraDescription cameraDescription;
   DateTime currentBackPressTime;
   Future futureShift;
   AudioCache player = AudioCache();
@@ -51,6 +56,16 @@ class _SystemHomePageState extends State<SystemHomePage> {
     var strTime = '$hoursStr:$minStr$ampm';
 
     return strTime;
+  }
+
+  _startUp() async {
+    List<CameraDescription> cameras = await availableCameras();
+
+    /// takes the front camera
+    cameraDescription = cameras.firstWhere(
+      (CameraDescription camera) =>
+          camera.lensDirection == CameraLensDirection.front,
+    );
   }
 
   shecdularFetching() {
@@ -120,7 +135,7 @@ class _SystemHomePageState extends State<SystemHomePage> {
 
   void initState() {
     super.initState();
-
+    _startUp();
     firstget();
   }
 
@@ -355,7 +370,6 @@ class _SystemHomePageState extends State<SystemHomePage> {
                                                               ),
                                                             )
                                                       : Container(
-                                              
                                                           height: 100,
                                                           child: AutoSizeText(
                                                             "برجاء التواجد بالموقع المخصص لك\n${Provider.of<UserData>(context, listen: true).siteName}",
@@ -366,32 +380,30 @@ class _SystemHomePageState extends State<SystemHomePage> {
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                              height: 2,
+                                                                height: 2,
                                                                 fontSize: ScreenUtil().setSp(
                                                                     18,
                                                                     allowFontScalingSelf:
                                                                         true)),
                                                           ),
                                                         )
-                                                  :  Container(
-                                              
-                                                          height: 100,
-                                                          child: AutoSizeText(
-                                                            "برجاء التواجد بالموقع المخصص لك\n${Provider.of<UserData>(context, listen: true).siteName}",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            maxLines: 4,
-                                                            style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              height: 2,
-                                                                fontSize: ScreenUtil().setSp(
-                                                                    18,
+                                                  : Container(
+                                                      height: 100,
+                                                      child: AutoSizeText(
+                                                        "برجاء التواجد بالموقع المخصص لك\n${Provider.of<UserData>(context, listen: true).siteName}",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        maxLines: 4,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            height: 2,
+                                                            fontSize: ScreenUtil()
+                                                                .setSp(18,
                                                                     allowFontScalingSelf:
                                                                         true)),
-                                                          ),
-                                                        )
+                                                      ),
+                                                    )
                                               : Container(
                                                   height: 20,
                                                   child: AutoSizeText(
@@ -505,7 +517,8 @@ class _SystemHomePageState extends State<SystemHomePage> {
                                                       MaterialPageRoute(
                                                         builder: (context) =>
                                                             CameraPicker(
-                                                          camera: cameras[1],
+                                                          camera:
+                                                              cameraDescription,
                                                         ),
                                                       )),
                                                   child: Container(

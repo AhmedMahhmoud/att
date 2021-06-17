@@ -1,7 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DirectoriesHeader extends StatelessWidget {
@@ -44,7 +44,7 @@ class DirectoriesHeader extends StatelessWidget {
           height: 30.h,
           child: AutoSizeText(title,
               maxLines: 1,
-              style: GoogleFonts.almarai(
+              style: TextStyle(
                 color: Colors.orange,
                 fontWeight: FontWeight.w600,
                 fontSize: 20,
@@ -88,7 +88,7 @@ class SmallDirectoriesHeader extends StatelessWidget {
         Container(
           height: 30.h,
           child: AutoSizeText(title,
-              style: GoogleFonts.almarai(
+              style: TextStyle(
                   color: Colors.orange,
                   fontWeight: FontWeight.w600,
                   fontSize:

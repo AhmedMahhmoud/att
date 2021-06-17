@@ -469,7 +469,7 @@ class _UserFullDataScreenState extends State<UserFullDataScreen>
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text("جدولة المستخدم"),
+                                          Text("جدولة المناوبات"),
                                           Container(
                                             width: 25.w,
                                             height: 35.h,

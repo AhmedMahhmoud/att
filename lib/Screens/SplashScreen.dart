@@ -8,6 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_users/MLmodule/db/database.dart';
+import 'package:qr_users/MLmodule/services/facenet.service.dart';
+import 'package:qr_users/MLmodule/services/ml_kit_service.dart';
 import 'package:qr_users/Screens/ChangePasswordScreen.dart';
 import 'package:qr_users/Screens/ErrorScreen.dart';
 import 'package:qr_users/Screens/HomePage.dart';
@@ -20,6 +23,7 @@ import 'package:qr_users/services/user_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path/path.dart' as p;
+import 'package:tflite/tflite.dart';
 import '../Screens/intro.dart';
 import 'package:http/http.dart' as http;
 
@@ -31,7 +35,9 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   bool isLoading = false;
-
+  DataBaseService _dataBaseService = DataBaseService();
+  FaceNetService _faceNetService = FaceNetService();
+  MLKitService _mlKitService = MLKitService();
   Future checkSharedUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> userData = (prefs.getStringList('userData') ?? null);
@@ -188,11 +194,25 @@ class _SplashScreenState extends State<SplashScreen>
     });
   }
 
+  loadModel() async {
+    var result = await Tflite.loadModel(
+        labels: "assets/labels.txt", model: "assets/model_unquant.tflite");
+    print("Result after loading model  : $result");
+  }
+
+  loadSecondModel() async {
+    // start the services
+    await _faceNetService.loadModel();
+    await _dataBaseService.loadDB();
+    _mlKitService.initialize();
+  }
+
   @override
   void initState() {
     super.initState();
     // filterList();
-
+    loadModel();
+    loadSecondModel();
     animationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 3),

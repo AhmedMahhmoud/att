@@ -18,6 +18,7 @@ import 'package:qr_users/services/report_data.dart';
 import 'package:qr_users/services/user_data.dart';
 import "./Screens/SystemScreens/SittingScreens/MembersScreens/ContactDataProv.dart";
 
+import 'MLmodule/widgets/FacePainter.dart';
 import 'enums/connectivity_status.dart';
 
 List<CameraDescription> cameras;
@@ -69,6 +70,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => UserPermessionsData(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => FacePainterr(),
         )
       ],
       child: ScreenUtilInit(
