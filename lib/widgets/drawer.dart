@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_users/Screens/AboutAppScreen.dart';
 import 'package:qr_users/Screens/AboutCompany.dart';
 import 'package:qr_users/Screens/AboutUsScreen.dart';
+import 'package:qr_users/Screens/NormalUserMenu/NormalUser.dart';
 import 'package:qr_users/Screens/intro.dart';
 import 'package:qr_users/Screens/loginScreen.dart';
 import 'package:qr_users/services/MemberData.dart';
@@ -107,6 +108,25 @@ class DrawerI extends StatelessWidget {
                 //   endIndent: 50,
                 // ),
                 ///---------------About Com-------------///
+                Provider.of<UserData>(context, listen: true).user.userType == 0
+                    ? MenuItem(
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => NormalUserMenu()));
+                        },
+                        title: "حسابى",
+                        icon: Icons.person)
+                    : Container(),
+                Provider.of<UserData>(context, listen: true).user.userType == 0
+                    ? Divider(
+                        height: 30.h,
+                        thickness: 0.5,
+                        color: Colors.white.withOpacity(0.3),
+                        indent: 50,
+                        endIndent: 50,
+                      )
+                    : Container(),
                 Provider.of<UserData>(context, listen: true).user.userType == 4
                     ? Column(
                         children: [

@@ -1,64 +1,64 @@
-// import 'dart:ui';
+import 'dart:ui';
 
-// import 'package:flutter/foundation.dart';
-// import 'package:flutter/material.dart';
-// import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 
-// class FacePainterr extends CustomPainter with ChangeNotifier {
-//   FacePainterr({@required this.imageSize, @required this.face});
-//   final Size imageSize;
-//   double scaleX, scaleY;
-//   String colorss = "red";
+class FacePainterr extends CustomPainter with ChangeNotifier {
+  FacePainterr({@required this.imageSize, @required this.face});
+  final Size imageSize;
+  double scaleX, scaleY;
+  String colorss = "red";
 
-//   Face face;
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     if (face == null) return;
+  Face face;
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (face == null) return;
 
-//     Paint paint;
+    Paint paint;
 
-//     if (this.face.headEulerAngleY > 10 || this.face.headEulerAngleY < -10) {
-//       paint = Paint()
-//         ..style = PaintingStyle.stroke
-//         ..strokeWidth = 3.0
-//         ..color = Colors.red;
-//     } else {
-//       paint = Paint()
-//         ..style = PaintingStyle.stroke
-//         ..strokeWidth = 3.0
-//         ..color = Colors.green;
-//       colorss = "green";
-//     }
+    if (this.face.headEulerAngleY > 10 || this.face.headEulerAngleY < -10) {
+      paint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.0
+        ..color = Colors.red;
+    } else {
+      paint = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3.0
+        ..color = Colors.green;
+      colorss = "green";
+    }
 
-//     scaleX = size.width / imageSize.width;
-//     scaleY = size.height / imageSize.height;
+    scaleX = size.width / imageSize.width;
+    scaleY = size.height / imageSize.height;
 
-//     canvas.drawRRect(
-//         _scaleRect(
-//             rect: face.boundingBox,
-//             imageSize: imageSize,
-//             widgetSize: size,
-//             scaleX: scaleX,
-//             scaleY: scaleY),
-//         paint);
-//   }
+    canvas.drawRRect(
+        _scaleRect(
+            rect: face.boundingBox,
+            imageSize: imageSize,
+            widgetSize: size,
+            scaleX: scaleX,
+            scaleY: scaleY),
+        paint);
+  }
 
-//   @override
-//   bool shouldRepaint(FacePainterr oldDelegate) {
-//     return oldDelegate.imageSize != imageSize || oldDelegate.face != face;
-//   }
-// }
+  @override
+  bool shouldRepaint(FacePainterr oldDelegate) {
+    return oldDelegate.imageSize != imageSize || oldDelegate.face != face;
+  }
+}
 
-// RRect _scaleRect(
-//     {@required Rect rect,
-//     @required Size imageSize,
-//     @required Size widgetSize,
-//     double scaleX,
-//     double scaleY}) {
-//   return RRect.fromLTRBR(
-//       (widgetSize.width - rect.left.toDouble() * scaleX),
-//       rect.top.toDouble() * scaleY,
-//       widgetSize.width - rect.right.toDouble() * scaleX,
-//       rect.bottom.toDouble() * scaleY,
-//       Radius.circular(10));
-// }
+RRect _scaleRect(
+    {@required Rect rect,
+    @required Size imageSize,
+    @required Size widgetSize,
+    double scaleX,
+    double scaleY}) {
+  return RRect.fromLTRBR(
+      (widgetSize.width - rect.left.toDouble() * scaleX),
+      rect.top.toDouble() * scaleY,
+      widgetSize.width - rect.right.toDouble() * scaleX,
+      rect.bottom.toDouble() * scaleY,
+      Radius.circular(10));
+}
