@@ -291,14 +291,17 @@ class MenuItem extends StatelessWidget {
                       width: double.infinity,
                       child: SizedBox(
                         height: 20,
-                        child: AutoSizeText(
-                          title,
-                          maxLines: 1,
-                          textAlign: TextAlign.right,
-                          style: TextStyle(
-                            fontSize: ScreenUtil()
-                                .setSp(16, allowFontScalingSelf: true),
-                            color: Colors.white,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 5.h),
+                          child: AutoSizeText(
+                            title,
+                            maxLines: 1,
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontSize: ScreenUtil()
+                                  .setSp(16, allowFontScalingSelf: true),
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),

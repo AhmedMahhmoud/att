@@ -37,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
   bool isLoading = false;
   // DataBaseService _dataBaseService = DataBaseService();
   // FaceNetService _faceNetService = FaceNetService();
-  MLKitService _mlKitService = MLKitService();
+  // MLKitService _mlKitService = MLKitService();
   Future checkSharedUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> userData = (prefs.getStringList('userData') ?? null);
@@ -204,7 +204,7 @@ class _SplashScreenState extends State<SplashScreen>
     // start the services
     // await _faceNetService.loadModel();
     // await _dataBaseService.loadDB();
-    _mlKitService.initialize();
+    // _mlKitService.initialize();
   }
 
   @override
