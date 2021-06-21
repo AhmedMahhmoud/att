@@ -71,9 +71,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (context) => UserPermessionsData(),
         ),
-        ChangeNotifierProvider(
-          create: (context) => FacePainterr(),
-        )
       ],
       child: ScreenUtilInit(
         designSize: Size(392.72, 807.27),

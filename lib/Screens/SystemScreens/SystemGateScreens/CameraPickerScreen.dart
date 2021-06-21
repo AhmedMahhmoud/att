@@ -67,9 +67,9 @@ class TakePictureScreenState extends State<CameraPicker>
   String numbers = "";
   List<Face> faces = [];
   // bool isLoading = false;
-  ui.Image _image;
+
   int numberOfFacesDetected = -1;
-  FacePainterr facePainterr;
+
   // CameraController _controller;
   // Future<void> _initializeControllerFuture;
   // File imagePath;
@@ -145,10 +145,7 @@ class TakePictureScreenState extends State<CameraPicker>
 
             if (_saving) {
               // _faceNetService.setCurrentPrediction(image, faceDetected);
-              if (mounted)
-                setState(() {
-                  _saving = false;
-                });
+
             }
           } else {
             if (mounted)
@@ -246,9 +243,7 @@ class TakePictureScreenState extends State<CameraPicker>
 
                           // Ensure that the camera is initialized.
                           await _initializeControllerFuture;
-                          print(
-                              Provider.of<FacePainterr>(context, listen: false)
-                                  .colorss);
+
                           // Construct the path where the image should be saved using the
                           // pattern package.
 
@@ -278,13 +273,14 @@ class TakePictureScreenState extends State<CameraPicker>
                             }
                           } else if (Platform.isAndroid) {
                             try {
-                              setState(() {
-                                numberOfFacesDetected = faces.length;
-                                imagePath = File(img.path);
-                                // // _faces = faces;
-                                // numberOfFacesDetected = faces.length;
-                                // _loadImage(File(img.path));
-                              });
+                              if (mounted)
+                                setState(() {
+                                  numberOfFacesDetected = faces.length;
+                                  imagePath = File(img.path);
+                                  // // _faces = faces;
+                                  // numberOfFacesDetected = faces.length;
+                                  // _loadImage(File(img.path));
+                                });
                             } catch (e) {
                               print(e);
                             }

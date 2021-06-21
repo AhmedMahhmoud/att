@@ -8,7 +8,6 @@ class FacePainterr extends CustomPainter with ChangeNotifier {
   FacePainterr({@required this.imageSize, @required this.face});
   final Size imageSize;
   double scaleX, scaleY;
-  String colorss = "red";
 
   Face face;
   @override
@@ -27,7 +26,6 @@ class FacePainterr extends CustomPainter with ChangeNotifier {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3.0
         ..color = Colors.green;
-      colorss = "green";
     }
 
     scaleX = size.width / imageSize.width;
