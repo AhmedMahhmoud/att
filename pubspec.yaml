@@ -40,7 +40,7 @@ dependencies:
   flutter_launcher_icons: ^0.8.1
   geolocator: ^6.2.1
   fluttertoast: ^7.1.6
-  camera: ^0.5.2+1
+  camera: ^0.5.8+17
   cron: ^0.2.4
   audioplayers: ^0.13.0
   permission_handler: ^5.0.1+1

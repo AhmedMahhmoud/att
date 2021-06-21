@@ -33,6 +33,7 @@ class UserVacationRequest extends StatefulWidget {
   _UserVacationRequestState createState() => _UserVacationRequestState();
 }
 
+TextEditingController titileController = TextEditingController();
 String selectedAction = "عارضة";
 String selectedPermession = "تأخير عن الحضور";
 var sleectedMember;
@@ -45,12 +46,13 @@ String dateFromString = "";
 List<String> actions = ["مرضى", "عارضة", "رصيد الاجازات", "حالة وفاة"];
 List<String> permessionTitles = ["تأخير عن الحضور", "انصراف مبكر"];
 TimeOfDay toPicked;
+String dateDifference;
 
 class _UserVacationRequestState extends State<UserVacationRequest> {
   @override
   void initState() {
     var now = DateTime.now();
-
+    titileController.text = "";
     fromDate = DateTime(now.year, now.month, now.day);
     toDate = DateTime(
         DateTime.now().year, DateTime.now().month, DateTime.now().day + 1);
@@ -68,11 +70,6 @@ class _UserVacationRequestState extends State<UserVacationRequest> {
   var selectedVal = "كل المواقع";
   @override
   Widget build(BuildContext context) {
-    var permessionProv =
-        Provider.of<UserPermessionsData>(context, listen: false)
-            .permessionsList;
-    var prov = Provider.of<SiteData>(context, listen: false);
-    var list = Provider.of<SiteData>(context, listen: true).dropDownSitesList;
     return GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
@@ -97,7 +94,7 @@ class _UserVacationRequestState extends State<UserVacationRequest> {
                                 SmallDirectoriesHeader(
                                   Lottie.asset("resources/calender.json",
                                       repeat: false),
-                                  "الأجازات و المأموريات",
+                                  "طلب اجازة / اذن",
                                 ),
                               ],
                             ),
@@ -176,7 +173,12 @@ class _UserVacationRequestState extends State<UserVacationRequest> {
                                                 setState(() {
                                                   fromDate = picked.first;
                                                   toDate = picked.last;
-
+                                                  dateDifference = (toDate
+                                                              .difference(
+                                                                  fromDate)
+                                                              .inDays +
+                                                          1)
+                                                      .toString();
                                                   String fromText =
                                                       " من ${DateFormat('yMMMd').format(fromDate).toString()}";
                                                   String toText =
@@ -232,60 +234,79 @@ class _UserVacationRequestState extends State<UserVacationRequest> {
                                       ),
                                     )),
                                     SizedBox(
+                                      height: 3,
+                                    ),
+                                    Container(
+                                        padding: EdgeInsets.all(5),
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          "تم اختيار $dateDifference يوم ",
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontWeight: FontWeight.w300),
+                                        )),
+                                    SizedBox(
                                       height: 5,
                                     ),
                                     VacationCardHeader(
                                       header: "نوع الأجازة",
                                     ),
-                                    Directionality(
-                                      textDirection: ui.TextDirection.rtl,
-                                      child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Container(
-                                            alignment: Alignment.topRight,
-                                            padding: EdgeInsets.only(right: 10),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                border: Border.all(width: 1)),
-                                            width: 150.w,
-                                            height: 40.h,
-                                            child: DropdownButtonHideUnderline(
-                                                child: DropdownButton(
-                                              elevation: 2,
-                                              isExpanded: true,
-                                              items: actions.map((String x) {
-                                                return DropdownMenuItem<String>(
-                                                    value: x,
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.centerRight,
-                                                      child: Text(
-                                                        x,
-                                                        textAlign:
-                                                            TextAlign.right,
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.orange,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
-                                                    ));
-                                              }).toList(),
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  selectedAction = value;
-                                                });
-                                              },
-                                              value: selectedAction,
-                                            )),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 5.w),
+                                      child: Directionality(
+                                        textDirection: ui.TextDirection.rtl,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Container(
+                                              alignment: Alignment.topRight,
+                                              padding:
+                                                  EdgeInsets.only(right: 10),
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(width: 1)),
+                                              width: 150.w,
+                                              height: 40.h,
+                                              child:
+                                                  DropdownButtonHideUnderline(
+                                                      child: DropdownButton(
+                                                elevation: 2,
+                                                isExpanded: true,
+                                                items: actions.map((String x) {
+                                                  return DropdownMenuItem<
+                                                          String>(
+                                                      value: x,
+                                                      child: Align(
+                                                        alignment: Alignment
+                                                            .centerRight,
+                                                        child: Text(
+                                                          x,
+                                                          textAlign:
+                                                              TextAlign.right,
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.orange,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500),
+                                                        ),
+                                                      ));
+                                                }).toList(),
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    selectedAction = value;
+                                                  });
+                                                },
+                                                value: selectedAction,
+                                              )),
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
+                                    DetialsTextField(),
                                     SizedBox(
                                       height: 50.h,
                                     ),
@@ -593,6 +614,7 @@ class _UserVacationRequestState extends State<UserVacationRequest> {
                                                 )),
                                               ),
                                             ),
+                                            DetialsTextField()
                                           ],
                                         ),
                                       ),
@@ -609,6 +631,45 @@ class _UserVacationRequestState extends State<UserVacationRequest> {
             ),
           ),
         ));
+  }
+}
+
+class DetialsTextField extends StatelessWidget {
+  const DetialsTextField({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Directionality(
+        textDirection: ui.TextDirection.rtl,
+        child: TextField(
+          controller: titileController,
+          cursorColor: Colors.orange,
+          maxLines: null,
+          decoration: InputDecoration(
+            errorStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(width: 2, color: Colors.orange),
+            ),
+            disabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(color: Colors.grey, width: 4)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.grey, width: 0)),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: Colors.grey, width: 0)),
+            hintStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            hintText: "قم بأدخال التفاصيل هنا",
+          ),
+          textAlign: TextAlign.right,
+        ),
+      ),
+    );
   }
 }
 

@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:camera/camera.dart';
@@ -13,19 +12,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_face/image_face.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:qr_users/MLmodule/db/database.dart';
-import 'package:qr_users/MLmodule/services/camera.service.dart';
-import 'package:qr_users/MLmodule/services/facenet.service.dart';
-
-import 'package:qr_users/MLmodule/services/ml_kit_service.dart';
-import 'package:qr_users/MLmodule/widgets/FacePainter.dart';
-import 'package:qr_users/Screens/SystemScreens/SittingScreens/CompanySettings/MainCompanySettings.dart';
 
 import 'package:qr_users/Screens/SystemScreens/SystemGateScreens/SytemScanner.dart';
 import "package:qr_users/widgets/headers.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'dart:ui' as ui;
+
 import "package:qr_users/MLmodule/services/UtilsScanner.dart";
 import 'package:tflite/tflite.dart';
 import 'package:qr_users/MLmodule/services/FaceDetectorPainter.dart';
