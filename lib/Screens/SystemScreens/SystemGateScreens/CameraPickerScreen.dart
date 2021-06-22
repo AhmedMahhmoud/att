@@ -18,6 +18,7 @@ import "package:qr_users/widgets/headers.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import "package:qr_users/MLmodule/services/UtilsScanner.dart";
+import 'package:qr_users/widgets/roundedAlert.dart';
 import 'package:tflite/tflite.dart';
 import 'package:qr_users/MLmodule/services/FaceDetectorPainter.dart';
 
@@ -64,7 +65,7 @@ class TakePictureScreenState extends State<CameraPicker>
     cameraController = CameraController(widget.camera, ResolutionPreset.high);
     try {
       faceDetector = FirebaseVision.instance.faceDetector(FaceDetectorOptions(
-          enableClassification: true,
+          enableClassification: false,
           minFaceSize: 0.1,
           enableTracking: true,
           mode: FaceDetectorMode.accurate));
@@ -228,42 +229,35 @@ class TakePictureScreenState extends State<CameraPicker>
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         InkWell(
-                          child: Container(
-                            width: 70.w,
-                            height: 70.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.transparent,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(15),
-                              child: Image(
-                                image: AssetImage("resources/imageface.jpeg"),
+                            child: Container(
+                              width: 70.w,
+                              height: 70.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.transparent,
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(15),
+                                child: Image(
+                                  image: AssetImage("resources/imageface.jpeg"),
+                                ),
                               ),
                             ),
-                          ),
-                          onTap: () async {
-                            final path = join(
-                              (await getTemporaryDirectory()).path,
-                              '${DateTime.now()}.jpg',
-                            );
-                            // await _controller.takePicture(path);
+                            onTap: () async {
+                              final path = join(
+                                (await getTemporaryDirectory()).path,
+                                '${DateTime.now()}.jpg',
+                              );
+                              // await _controller.takePicture(path);
 
-                            await Future.delayed(Duration(milliseconds: 500));
-                            await cameraController.stopImageStream();
-                            await Future.delayed(Duration(milliseconds: 200));
-                            await cameraController.takePicture(path);
+                              await Future.delayed(Duration(milliseconds: 500));
+                              await cameraController.stopImageStream();
+                              await Future.delayed(Duration(milliseconds: 200));
+                              await cameraController.takePicture(path);
 
-                            File img = File(path);
-                            await applyModelOnImage(img);
-                            if (Platform.isIOS) {
-                              bool _has = await ImageFace.hasFace(img);
-                              if (_has) {
-                                numberOfFacesDetected = 1;
-                              } else {
-                                numberOfFacesDetected = 0;
-                              }
-                            } else if (Platform.isAndroid) {
+                              File img = File(path);
+                              await applyModelOnImage(img);
+
                               try {
                                 if (mounted) {
                                   setState(() {
@@ -274,66 +268,80 @@ class TakePictureScreenState extends State<CameraPicker>
                               } catch (e) {
                                 print(e);
                               }
-                            }
 
-                            final newPath = join(
-                              (await getTemporaryDirectory()).path,
-                              '${DateTime.now()}.jpg',
-                            );
-                            if (Platform.isAndroid) {
+                              final newPath = join(
+                                (await getTemporaryDirectory()).path,
+                                '${DateTime.now()}.jpg',
+                              );
+
                               if (mounted)
                                 setState(() {
                                   image = File(newPath);
                                   print("model name : $name ");
                                   print("confidence : $confiedence");
                                 });
-                            }
 
-                            await testCompressAndGetFile(
-                                file: img, targetPath: newPath);
-                            // _cameraService.cameraController.dispose();
-                            cameraController.dispose();
-                            // _cameraService.cameraController.dispose();
-                            print("=====Compressed==========");
-                            if (name == "mobiles") {
-                              Fluttertoast.showToast(
-                                  msg: "خطأ : برجاء التقاط صورة حقيقية",
-                                  backgroundColor: Colors.red,
-                                  gravity: ToastGravity.CENTER,
-                                  toastLength: Toast.LENGTH_LONG);
-                              Navigator.pop(context);
-                            } else if (numberOfFacesDetected == 1) {
-                              Future.delayed(const Duration(seconds: 1), () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => SystemScanPage(
-                                        path: newPath,
-                                      ),
-                                    ));
-                              });
-                            } else if (numberOfFacesDetected > 1) {
-                              Fluttertoast.showToast(
-                                  msg: "خطا : تم التعرف علي اكثر من وجة ",
-                                  backgroundColor: Colors.red,
-                                  gravity: ToastGravity.CENTER,
-                                  toastLength: Toast.LENGTH_LONG);
-                              Navigator.pop(context);
-                            } else {
-                              Fluttertoast.showToast(
-                                  msg: "برجاء تصوير وجهك بوضوح",
-                                  backgroundColor: Colors.red,
-                                  gravity: ToastGravity.CENTER,
-                                  toastLength: Toast.LENGTH_LONG);
-                              Navigator.pop(context);
-                            }
-                          },
-                        )
+                              await testCompressAndGetFile(
+                                  file: img, targetPath: newPath);
+                              // _cameraService.cameraController.dispose();
+                              cameraController.dispose();
+                              // _cameraService.cameraController.dispose();
+                              print("=====Compressed==========");
+
+                              if (name == "mobiles") {
+                                Fluttertoast.showToast(
+                                    msg: "خطأ : برجاء التقاط صورة حقيقية",
+                                    backgroundColor: Colors.red,
+                                    gravity: ToastGravity.CENTER,
+                                    toastLength: Toast.LENGTH_LONG);
+                                Navigator.pop(context);
+                              } else if (numberOfFacesDetected == 1) {
+                                Future.delayed(const Duration(seconds: 1), () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SystemScanPage(
+                                          path: newPath,
+                                        ),
+                                      ));
+                                });
+                              } else if (numberOfFacesDetected > 1) {
+                                Fluttertoast.showToast(
+                                    msg: "خطا : تم التعرف علي اكثر من وجة ",
+                                    backgroundColor: Colors.red,
+                                    gravity: ToastGravity.CENTER,
+                                    toastLength: Toast.LENGTH_LONG);
+                                Navigator.pop(context);
+                              } else {
+                                Fluttertoast.showToast(
+                                    msg: "برجاء تصوير وجهك بوضوح",
+                                    backgroundColor: Colors.red,
+                                    gravity: ToastGravity.CENTER,
+                                    toastLength: Toast.LENGTH_LONG);
+                                Navigator.pop(context);
+                              }
+                            })
                       ],
                     ),
                   )
             : Container()));
 
+    stackWidgetChildren.add(Positioned(
+      left: 4.0,
+      top: 4.0,
+      child: SafeArea(
+        child: IconButton(
+          icon: Icon(
+            Icons.chevron_left,
+            color: Color(0xffF89A41),
+            size: 40,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+    ));
     return GestureDetector(
       child: Scaffold(
         body: image == null
@@ -345,6 +353,11 @@ class TakePictureScreenState extends State<CameraPicker>
                   image: FileImage(imagePath),
                   fit: BoxFit.fill,
                   height: double.infinity,
+                ),
+                Positioned(
+                  child: RoundedLoadingIndicator(),
+                  bottom: 100.h,
+                  left: 25.w,
                 ),
                 HeaderBeforeLogin(),
 

@@ -138,11 +138,6 @@ class _CompanySettingsState extends State<CompanySettings> {
                 showAttendanceSettings();
               }),
 
-          ServiceTile(
-              title: "test",
-              subTitle: "test",
-              icon: FontAwesomeIcons.usersCog,
-              onTap: () async {}),
           // ServiceTile(
           //     title: "test only",
           //     subTitle: "testonly",

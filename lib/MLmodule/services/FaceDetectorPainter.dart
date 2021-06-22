@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
@@ -30,15 +32,29 @@ class FaceDetectorPainter extends CustomPainter {
 
     for (Face face in faces) {
       canvas.drawRect(
-          Rect.fromLTRB(
-              cameraLensDirection == CameraLensDirection.back
-                  ? face.boundingBox.left * scaleX
-                  : (absulteImageSize.width - face.boundingBox.right) * scaleX,
-              face.boundingBox.top * scaleY,
-              cameraLensDirection == CameraLensDirection.back
-                  ? face.boundingBox.right * scaleX
-                  : (absulteImageSize.width - face.boundingBox.left) * scaleX,
-              face.boundingBox.bottom * scaleY),
+          Platform.isIOS
+              ? Rect.fromLTRB(
+                  cameraLensDirection == CameraLensDirection.front
+                      ? face.boundingBox.left * scaleY
+                      : (absulteImageSize.width - face.boundingBox.right) *
+                          scaleX,
+                  face.boundingBox.top * scaleY,
+                  cameraLensDirection == CameraLensDirection.front
+                      ? face.boundingBox.right * scaleY
+                      : (absulteImageSize.width - face.boundingBox.left) *
+                          scaleX,
+                  face.boundingBox.bottom * scaleY)
+              : Rect.fromLTRB(
+                  cameraLensDirection == CameraLensDirection.back
+                      ? face.boundingBox.left * scaleY
+                      : (absulteImageSize.width - face.boundingBox.right) *
+                          scaleX,
+                  face.boundingBox.top * scaleY,
+                  cameraLensDirection == CameraLensDirection.back
+                      ? face.boundingBox.right * scaleY
+                      : (absulteImageSize.width - face.boundingBox.left) *
+                          scaleX,
+                  face.boundingBox.bottom * scaleY),
           paint);
     }
   }
