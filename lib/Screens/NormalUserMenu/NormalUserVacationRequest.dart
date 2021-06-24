@@ -236,15 +236,17 @@ class _UserVacationRequestState extends State<UserVacationRequest> {
                                     SizedBox(
                                       height: 3,
                                     ),
-                                    Container(
-                                        padding: EdgeInsets.all(5),
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "تم اختيار $dateDifference يوم ",
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontWeight: FontWeight.w300),
-                                        )),
+                                    dateDifference != null
+                                        ? Container(
+                                            padding: EdgeInsets.all(5),
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              "تم اختيار $dateDifference يوم ",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontWeight: FontWeight.w300),
+                                            ))
+                                        : Container(),
                                     SizedBox(
                                       height: 5,
                                     ),

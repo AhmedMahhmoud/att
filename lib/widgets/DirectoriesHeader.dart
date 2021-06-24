@@ -73,10 +73,6 @@ class SmallDirectoriesHeader extends StatelessWidget {
             width: 40.w,
             height: 35,
             decoration: BoxDecoration(
-              // image: DecorationImage(
-              //   image: headerImage,
-              //   fit: BoxFit.fill,
-              // ),
               shape: BoxShape.circle,
             ),
             child: lottie,

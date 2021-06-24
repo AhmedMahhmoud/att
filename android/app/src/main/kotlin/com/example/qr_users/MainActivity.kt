@@ -1,4 +1,4 @@
-package com.example.qr_users
+package com.tds.chilango
 
 import io.flutter.embedding.android.FlutterActivity
 

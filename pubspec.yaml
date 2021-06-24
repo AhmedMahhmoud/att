@@ -40,7 +40,7 @@ dependencies:
   flutter_launcher_icons: ^0.8.1
   geolocator: ^6.2.1
   fluttertoast: ^7.1.6
-  camera: ^0.5.8+17
+  camera: ^0.5.8+11
   cron: ^0.2.4
   audioplayers: ^0.13.0
   permission_handler: ^5.0.1+1
@@ -50,6 +50,7 @@ dependencies:
   flutter_image_compress: ^0.7.0
   curved_navigation_bar: ^0.3.4
   image_pickers: ^1.0.8+7
+  image_picker: 0.6.2+3
   date_time_picker: ^1.1.1
   google_maps_flutter: ^0.5.33
   date_range_picker: ^1.0.7
@@ -78,11 +79,11 @@ dependencies:
   firebase_ml_vision: ^0.9.2+1
   firebase_core: ^0.4.0+9
   firebase_analytics: ^5.0.2
-  tflite: ^1.0.6
+  # tflite: ^1.0.6
   meta: ^1.1.8
-  cell_info: ^0.0.9
-  # google_ml_kit: ^0.5.0
-  # tflite_flutter: ^0.5.0
+  expandable: ^5.0.1
+  google_ml_kit: ^0.5.0
+  tflite_flutter: ^0.8.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

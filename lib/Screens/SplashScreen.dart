@@ -23,7 +23,8 @@ import 'package:qr_users/services/user_data.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path/path.dart' as p;
-import 'package:tflite/tflite.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
+// import 'package:tflite/tflite.dart';
 import '../Screens/intro.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,9 +36,9 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   bool isLoading = false;
-  // DataBaseService _dataBaseService = DataBaseService();
+  DataBaseService _dataBaseService = DataBaseService();
   // FaceNetService _faceNetService = FaceNetService();
-  // MLKitService _mlKitService = MLKitService();
+  MLKitService _mlKitService = MLKitService();
   Future checkSharedUserData() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> userData = (prefs.getStringList('userData') ?? null);
@@ -195,16 +196,20 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   loadModel() async {
-    var result = await Tflite.loadModel(
-        labels: "assets/labels.txt", model: "assets/model_unquant.tflite");
-    print("Result after loading model  : $result");
+    var interpreterOptions = InterpreterOptions()..addDelegate(NnApiDelegate());
+    final interpreter = await Interpreter.fromAsset('model_unquant.tflite',
+        options: interpreterOptions);
+    print("Result after loading model  : $interpreter");
+    // var result = await Tflite.loadModel(
+    //     labels: "assets/labels.txt", model: "assets/model_unquant.tflite");
+    // print("Result after loading model  : $result");
   }
 
   loadSecondModel() async {
     // start the services
     // await _faceNetService.loadModel();
-    // await _dataBaseService.loadDB();
-    // _mlKitService.initialize();
+    await _dataBaseService.loadDB();
+    _mlKitService.initialize();
   }
 
   @override

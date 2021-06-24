@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_users/Screens/SystemScreens/NavSceen.dart';
@@ -19,6 +20,7 @@ import 'package:qr_users/widgets/headers.dart';
 
 import 'NormalUserReport.dart';
 import 'NormalUserVacationRequest.dart';
+import 'NormalUsersOrders.dart';
 
 class NormalUserMenu extends StatefulWidget {
   @override
@@ -51,6 +53,17 @@ class _NormalUserMenuState extends State<NormalUserMenu> {
             Navigator.of(context).push(
               new MaterialPageRoute(
                 builder: (context) => UserVacationRequest(),
+              ),
+            );
+          }),
+      ReportTile(
+          title: "متابعة طلباتى ",
+          subTitle: "متابعة حالة الطلبات ",
+          icon: FontAwesomeIcons.clipboardList,
+          onTap: () {
+            Navigator.of(context).push(
+              new MaterialPageRoute(
+                builder: (context) => UserOrdersView(),
               ),
             );
           }),

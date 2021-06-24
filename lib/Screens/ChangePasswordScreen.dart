@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:camera/camera.dart';
 import 'package:device_info/device_info.dart';
 
 import 'package:flutter/material.dart';
@@ -13,6 +14,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' as Path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_users/MLmodule/db/database.dart';
+import 'package:qr_users/MLmodule/services/camera.service.dart';
+import 'package:qr_users/MLmodule/services/facenet.service.dart';
+import 'package:qr_users/MLmodule/services/ml_kit_service.dart';
 import 'package:qr_users/Screens/HomePage.dart';
 
 import 'package:qr_users/Screens/intro.dart';
@@ -27,6 +32,8 @@ import 'dart:ui' as ui;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'dart:async';
+
+import 'SystemScreens/SystemGateScreens/CameraPickerScreen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   final int userType;
@@ -47,124 +54,23 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   GalleryMode _galleryMode = GalleryMode.image;
   List<Media> _listImagePaths = List();
 
-  Future<void> selectImages() async {
-    DateTime uploadTime = DateTime.now();
-    Navigator.pop(context);
-
+  Future<void> cameraPick(File image) async {
     try {
-      // showDialog(
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return RoundedLoadingIndicator();
-      //     });
-
-      _galleryMode = GalleryMode.image;
-      _listImagePaths = await ImagePickers.pickerPaths(
-        galleryMode: _galleryMode,
-        showGif: true,
-        selectCount: 1,
-        showCamera: true,
-        cropConfig: CropConfig(enableCrop: true, height: 1, width: 1),
-        compressSize: 500,
-        uiConfig: UIConfig(
-          uiThemeColor: Colors.orange,
-        ),
-      );
-      _listImagePaths.forEach((media) {
-        print(media.path.toString());
-      });
-
-      img = File(_listImagePaths[0].path);
-      final path = Path.join(
-        // Store the picture in the temp directory.
-        // Find the temp directory using the `path_provider` plugin.
-        (await getTemporaryDirectory()).path,
-        '${DateTime.now()}.jpg',
-      );
-      await testCompressAndGetFile(file: img, targetPath: path).then((value) {
-        setState(() {
-          isLoading = true;
-        });
-      });
-      await Provider.of<UserData>(context, listen: false)
-          .updateProfileImgFile(path)
-          .then((value) {
-        print("value = $value");
-        if (value == "success") {
-          setState(() {
-            isLoading = false;
-          });
-          // Duration d = DateTime.now().difference(uploadTime);
-          // Timer(d, () async {
-          //   // Navigator.pop(context);
-          // });
-          Fluttertoast.showToast(
-              msg: "تم التعديل بنجاح",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-        } else if (value == "noInternet") {
-          Fluttertoast.showToast(
-              msg: "خطأ في التعديل: لا يوجد اتصال بالانترنت",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-          // Navigator.pop(context);
-        } else {
-          Fluttertoast.showToast(
-              msg: "خطأ في التعديل",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-          // Navigator.pop(context);
-        }
-      });
-      print("done!");
-    } on PlatformException {}
-  }
-
-  Future<void> cameraPick() async {
-    Navigator.pop(context);
-    try {
-      await ImagePickers.openCamera(
-              cropConfig: CropConfig(enableCrop: true, width: 1, height: 1))
-          .then((Media media) {
-        _listImagePaths.clear();
-        _listImagePaths.add(media);
-      });
-
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return RoundedLoadingIndicator();
           });
-      // print(img.lengthSync());
-      img = File(_listImagePaths[0].path);
-      final path = Path.join(
-        // Store the picture in the temp directory.
-        // Find the temp directory using the `path_provider` plugin.
-        (await getTemporaryDirectory()).path,
-        '${DateTime.now()}.jpg',
-      );
-      await testCompressAndGetFile(file: img, targetPath: path);
 
+      RoundedLoadingIndicator();
       await Provider.of<UserData>(context, listen: false)
-          .updateProfileImgFile(path)
+          .updateProfileImgFile(image.path)
           .then((value) {
         if (value == "success") {
-          // print(value);
+          // print(value)
 
           Fluttertoast.showToast(
-              msg: "تم التعديل بنجاح",
+              msg: "تم حفظ الصورة بنجاح",
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
@@ -191,7 +97,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
         }
       });
-
       Navigator.pop(context);
       print("done!");
     } catch (e) {
@@ -209,25 +114,40 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return result;
   }
 
-  void _showAddPhoto() {
-    RoundedDialog _dialog = new RoundedDialog(
-      cameraOnPressedFunc: () => cameraPick(),
-      galleryOnPressedFunc: () => selectImages(),
-    );
+  // void _showAddPhoto() {
+  //   RoundedDialog _dialog = new RoundedDialog(
+  //     cameraOnPressedFunc: () => cameraPick(),
+  //     galleryOnPressedFunc: () => selectImages(),
+  //   );
 
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return _dialog;
-        });
-  }
+  //   showDialog(
+  //       context: context,
+  //       builder: (BuildContext context) {
+  //         return _dialog;
+  //       });
+  // }
 
   @override
   void initState() {
-    // TODO: implement initState
+    /// takes the front camera
+    _startUp();
+
     super.initState();
   }
 
+  _startUp() async {
+    List<CameraDescription> cameras = await availableCameras();
+
+    /// takes the front camera
+    cameraDescription = cameras.firstWhere(
+      (CameraDescription camera) =>
+          camera.lensDirection == CameraLensDirection.front,
+    );
+  }
+
+  var result;
+  CameraDescription cameraDescription;
+  File imagePath;
   var _passwordVisible = true;
   var _repasswordVisible = true;
   @override
@@ -244,28 +164,65 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    ProfileHeader(
-                      title: "برجاء اختيار صورة شخصية",
-                      headerImage: Container(
-                        height: 140.h,
-                        child: CachedNetworkImage(
-                          imageUrl: userData.user.userImage,
-                          fit: BoxFit.fill,
-                          placeholder: (context, url) => Center(
-                            child: CircularProgressIndicator(
-                                backgroundColor: Colors.white,
-                                valueColor: new AlwaysStoppedAnimation<Color>(
-                                    Colors.orange)),
+                    Stack(
+                      children: [
+                        ProfileHeader(
+                          title: "برجاء اختيار صورة شخصية",
+                          headerImage: Container(
+                            height: 140.h,
+                            child: CachedNetworkImage(
+                              imageUrl: userData.user.userImage,
+                              fit: BoxFit.fill,
+                              placeholder: (context, url) => Center(
+                                child: CircularProgressIndicator(
+                                    backgroundColor: Colors.white,
+                                    valueColor:
+                                        new AlwaysStoppedAnimation<Color>(
+                                            Colors.orange)),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  Provider.of<UserData>(context, listen: true)
+                                      .changedWidget,
+                            ),
                           ),
-                          errorWidget: (context, url, error) =>
-                              Provider.of<UserData>(context, listen: true)
-                                  .changedWidget,
+                          onPressed: () {
+                            // _onImageButtonPressed(ImageSource.gallery);
+                          },
                         ),
-                      ),
-                      onPressed: () {
-                        _showAddPhoto();
-                        // _onImageButtonPressed(ImageSource.gallery);
-                      },
+                        Provider.of<UserData>(context, listen: false)
+                                .user
+                                .userImage
+                                .contains("DefualtImage")
+                            ? Positioned(
+                                right: 135.w,
+                                bottom: 120.h,
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => CameraPicker(
+                                            camera: cameraDescription,
+                                            fromScreen: "register",
+                                          ),
+                                        ));
+                                    await cameraPick(result);
+                                  },
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xffFF7E00),
+                                    ),
+                                    height: 35.h,
+                                    width: 35.w,
+                                    child: Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ))
+                            : Container()
+                      ],
                     ),
                     Container(
                       height: 20,
@@ -443,201 +400,96 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   Future changePass() async {
     if (_profileFormKey.currentState.validate()) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return RoundedLoadingIndicator();
-          });
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      if (Provider.of<UserData>(context, listen: false)
+          .user
+          .userImage
+          .contains("DefualtImage")) {
+        Fluttertoast.showToast(
+            msg: 'برجاء التقاط صورة شخصية للوجة اولا',
+            backgroundColor: Colors.red,
+            toastLength: Toast.LENGTH_LONG);
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return RoundedLoadingIndicator();
+            });
 
-      try {
-        var msg = await Provider.of<UserData>(context, listen: false)
-            .changePassword(_passwordController.text);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
 
-        print(msg);
-        Navigator.pop(context);
-        if (msg == "success") {
-          try {
-            if (Platform.isIOS) {
-              final storage = new FlutterSecureStorage();
-              final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
-              var data = await deviceInfoPlugin.iosInfo;
-              String chainValue = await storage.read(key: "deviceMac");
+        try {
+          var msg = await Provider.of<UserData>(context, listen: false)
+              .changePassword(_passwordController.text);
 
-              print(
-                  "saving to the keychain mac : ${data.identifierForVendor}"); //UUID for iOS
-              if (chainValue == "" || chainValue == null) {
-                print("dddd");
-                await storage
-                    .write(key: "deviceMac", value: data.identifierForVendor)
-                    .whenComplete(
-                        () => print("item added to keychain successfully !"))
-                    .catchError((e) {
-                  print(e);
-                });
-              }
-            }
-          } catch (e) {
-            print(e);
-          }
-
-          prefs.setStringList(
-              'userData', [widget.userName, _passwordController.text]);
-          if (widget.userType == 0) {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomePage(),
-                ));
-          } else if (widget.userType > 0) {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PageIntro(
-                    userType: 1,
-                  ),
-                ));
-          }
-
-          Fluttertoast.showToast(
-              msg: "تم الحفظ بنجاح",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-        } else {
-          Fluttertoast.showToast(
-              gravity: ToastGravity.CENTER,
-              msg: "خطأ في حفظ البيانات",
-              toastLength: Toast.LENGTH_SHORT,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
+          print(msg);
           Navigator.pop(context);
+          if (msg == "success") {
+            try {
+              if (Platform.isIOS) {
+                final storage = new FlutterSecureStorage();
+                final DeviceInfoPlugin deviceInfoPlugin =
+                    new DeviceInfoPlugin();
+                var data = await deviceInfoPlugin.iosInfo;
+                String chainValue = await storage.read(key: "deviceMac");
+
+                print(
+                    "saving to the keychain mac : ${data.identifierForVendor}"); //UUID for iOS
+                if (chainValue == "" || chainValue == null) {
+                  print("dddd");
+                  await storage
+                      .write(key: "deviceMac", value: data.identifierForVendor)
+                      .whenComplete(
+                          () => print("item added to keychain successfully !"))
+                      .catchError((e) {
+                    print(e);
+                  });
+                }
+              }
+            } catch (e) {
+              print(e);
+            }
+
+            prefs.setStringList(
+                'userData', [widget.userName, _passwordController.text]);
+            if (widget.userType == 0) {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(),
+                  ));
+            } else if (widget.userType > 0) {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PageIntro(
+                      userType: 1,
+                    ),
+                  ));
+            }
+
+            Fluttertoast.showToast(
+                msg: "تم الحفظ بنجاح",
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.CENTER,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
+          } else {
+            Fluttertoast.showToast(
+                gravity: ToastGravity.CENTER,
+                msg: "خطأ في حفظ البيانات",
+                toastLength: Toast.LENGTH_SHORT,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
+            Navigator.pop(context);
+          }
+        } catch (e) {
+          print(e);
         }
-      } catch (e) {
-        print(e);
       }
     }
-  }
-}
-
-class RoundedDialog extends StatelessWidget {
-  final Function cameraOnPressedFunc;
-  final Function galleryOnPressedFunc;
-
-  RoundedDialog({this.cameraOnPressedFunc, this.galleryOnPressedFunc});
-
-  @override
-  Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: ui.TextDirection.rtl,
-      child: Dialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-        child: Container(
-          height: 170.h,
-          width: 300.w,
-          child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  InkWell(
-                    onTap: cameraOnPressedFunc,
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.camera_alt,
-                          size: ScreenUtil()
-                              .setSp(40, allowFontScalingSelf: true),
-                          color: Colors.orange,
-                        ),
-                        SizedBox(
-                          width: 10.w,
-                        ),
-                        Container(
-                          height: 20,
-                          child: AutoSizeText(
-                            "التقاط صورة",
-                            maxLines: 1,
-                            style: TextStyle(
-                                fontSize: ScreenUtil()
-                                    .setSp(18, allowFontScalingSelf: true)),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  InkWell(
-                    onTap: galleryOnPressedFunc,
-                    child: Container(
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.image,
-                            size: ScreenUtil()
-                                .setSp(40, allowFontScalingSelf: true),
-                            color: Colors.orange,
-                          ),
-                          SizedBox(
-                            width: 10.w,
-                          ),
-                          Container(
-                            height: 20,
-                            child: AutoSizeText(
-                              "اختر صورة من المعرض",
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontSize: ScreenUtil()
-                                      .setSp(18, allowFontScalingSelf: true)),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15.h,
-                  ),
-                  SizedBox(
-                    width: 150.0.w,
-                    child: Material(
-                      elevation: 5.0,
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(15.0),
-                      child: MaterialButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        minWidth: 130.w,
-                        height: 30.h,
-                        child: Container(
-                          height: 20,
-                          child: AutoSizeText(
-                            "الغاء",
-                            maxLines: 1,
-                            style: TextStyle(
-                              color: Colors.orange,
-                              fontWeight: FontWeight.bold,
-                              fontSize: ScreenUtil()
-                                  .setSp(17, allowFontScalingSelf: true),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              )),
-        ),
-      ),
-    );
   }
 }

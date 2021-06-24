@@ -39,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String bottomText = 'تعديل';
   Color textColor = Colors.black45;
   File img;
-  var isLoading = false;
+
   // final ImagePicker _picker = ImagePicker();
   // PickedFile _imageFile;
   GalleryMode _galleryMode = GalleryMode.image;
@@ -61,158 +61,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return output.join("");
   }
 
-  Future<void> selectImages() async {
-    DateTime uploadTime = DateTime.now();
-    Navigator.pop(context);
-
-    try {
-      // showDialog(
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return RoundedLoadingIndicator();
-      //     });
-
-      _galleryMode = GalleryMode.image;
-      _listImagePaths = await ImagePickers.pickerPaths(
-        galleryMode: _galleryMode,
-        showGif: true,
-        selectCount: 1,
-        showCamera: true,
-        cropConfig: CropConfig(enableCrop: true, height: 1, width: 1),
-        compressSize: 500,
-        uiConfig: UIConfig(
-          uiThemeColor: Colors.orange,
-        ),
-      );
-      _listImagePaths.forEach((media) {
-        print(media.path.toString());
-      });
-
-      img = File(_listImagePaths[0].path);
-      final path = Path.join(
-        // Store the picture in the temp directory.
-        // Find the temp directory using the `path_provider` plugin.
-        (await getTemporaryDirectory()).path,
-        '${DateTime.now()}.jpg',
-      );
-      await testCompressAndGetFile(file: img, targetPath: path).then((value) {
-        setState(() {
-          isLoading = true;
-        });
-      });
-      await Provider.of<UserData>(context, listen: false)
-          .updateProfileImgFile(path)
-          .then((value) {
-        print("value = $value");
-        if (value == "success") {
-          setState(() {
-            isLoading = false;
-          });
-          // Duration d = DateTime.now().difference(uploadTime);
-          // Timer(d, () async {
-          //   // Navigator.pop(context);
-          // });
-          Fluttertoast.showToast(
-              msg: "تم التعديل بنجاح",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-        } else if (value == "noInternet") {
-          Fluttertoast.showToast(
-              msg: "خطأ في التعديل: لا يوجد اتصال بالانترنت",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-          // Navigator.pop(context);
-        } else {
-          Fluttertoast.showToast(
-              msg: "خطأ في التعديل",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-          // Navigator.pop(context);
-        }
-      });
-      print("done!");
-    } on PlatformException {}
-  }
-
-  Future<void> cameraPick() async {
-    Navigator.pop(context);
-    try {
-      await ImagePickers.openCamera(
-              cropConfig: CropConfig(enableCrop: true, width: 1, height: 1))
-          .then((Media media) {
-        _listImagePaths.clear();
-        _listImagePaths.add(media);
-      });
-
-      // print(img.lengthSync());
-      img = File(_listImagePaths[0].path);
-      final path = Path.join(
-        // Store the picture in the temp directory.
-        // Find the temp directory using the `path_provider` plugin.
-        (await getTemporaryDirectory()).path,
-        '${DateTime.now()}.jpg',
-      );
-      await testCompressAndGetFile(file: img, targetPath: path);
-
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return RoundedLoadingIndicator();
-          });
-
-      var url = await Provider.of<UserData>(context, listen: false)
-          .updateProfileImgFile(path)
-          .then((value) {
-        Navigator.pop(context);
-        if (value == "success") {
-          Fluttertoast.showToast(
-              msg: "تم التعديل بنجاح",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-        } else if (value == "noInternet") {
-          Fluttertoast.showToast(
-              msg: "خطأ في التعديل: لا يوجد اتصال بالانترنت",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-        } else {
-          Fluttertoast.showToast(
-              msg: "خطأ في التعديل",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.red,
-              textColor: Colors.white,
-              fontSize: ScreenUtil().setSp(16, allowFontScalingSelf: true));
-        }
-      });
-      print(url);
-
-      print("done!");
-    } catch (e) {
-      print(e);
-    }
-  }
-
   Future<File> testCompressAndGetFile({File file, String targetPath}) async {
     var result = await FlutterImageCompress.compressAndGetFile(
       file.absolute.path,
@@ -221,19 +69,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     return result;
-  }
-
-  void showAddPhoto() {
-    RoundedDialog _dialog = new RoundedDialog(
-      cameraOnPressedFunc: () => cameraPick(),
-      galleryOnPressedFunc: () => selectImages(),
-    );
-
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return _dialog;
-        });
   }
 
   @override
@@ -259,36 +94,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   ProfileHeader(
-                    onPressed: () => showAddPhoto(),
-                    headerImage: GestureDetector(
-                      onTap: () => showAddPhoto(),
-                      child: isLoading
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                  backgroundColor: Colors.white,
-                                  valueColor: new AlwaysStoppedAnimation<Color>(
-                                      Colors.orange)),
-                            )
-                          : Container(
-                              height: 150.h,
-                              child: CachedNetworkImage(
-                                imageUrl:
-                                    Provider.of<UserData>(context, listen: true)
-                                        .user
-                                        .userImage,
-                                fit: BoxFit.fill,
-                                placeholder: (context, url) => Center(
-                                  child: CircularProgressIndicator(
-                                      backgroundColor: Colors.white,
-                                      valueColor:
-                                          new AlwaysStoppedAnimation<Color>(
-                                              Colors.orange)),
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    Provider.of<UserData>(context, listen: true)
-                                        .changedWidget,
-                              ),
-                            ),
+                    headerImage: Container(
+                      height: 150.h,
+                      child: CachedNetworkImage(
+                        imageUrl: Provider.of<UserData>(context, listen: true)
+                            .user
+                            .userImage,
+                        fit: BoxFit.fill,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(
+                              backgroundColor: Colors.white,
+                              valueColor: new AlwaysStoppedAnimation<Color>(
+                                  Colors.orange)),
+                        ),
+                        errorWidget: (context, url, error) =>
+                            Provider.of<UserData>(context, listen: true)
+                                .changedWidget,
+                      ),
                     ),
                   ),
                   SingleChildScrollView(
@@ -659,37 +481,6 @@ class RoundedDialog extends StatelessWidget {
                           ),
                         )
                       ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 10.h,
-                  ),
-                  InkWell(
-                    onTap: galleryOnPressedFunc,
-                    child: Container(
-                      child: Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.image,
-                            size: ScreenUtil()
-                                .setSp(40, allowFontScalingSelf: true),
-                            color: Colors.orange,
-                          ),
-                          SizedBox(
-                            width: 10.w,
-                          ),
-                          Container(
-                            height: 20,
-                            child: AutoSizeText(
-                              "اختر صورة من المعرض",
-                              maxLines: 1,
-                              style: TextStyle(
-                                  fontSize: ScreenUtil()
-                                      .setSp(18, allowFontScalingSelf: true)),
-                            ),
-                          )
-                        ],
-                      ),
                     ),
                   ),
                   SizedBox(

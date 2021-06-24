@@ -12,20 +12,27 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_face/image_face.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:qr_users/MLmodule/db/database.dart';
+import 'package:qr_users/MLmodule/services/camera.service.dart';
+import 'package:qr_users/MLmodule/services/facenet.service.dart';
+import 'package:qr_users/MLmodule/services/ml_kit_service.dart';
 
 import 'package:qr_users/Screens/SystemScreens/SystemGateScreens/SytemScanner.dart';
+import 'package:qr_users/services/user_data.dart';
 import "package:qr_users/widgets/headers.dart";
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import "package:qr_users/MLmodule/services/UtilsScanner.dart";
 import 'package:qr_users/widgets/roundedAlert.dart';
-import 'package:tflite/tflite.dart';
+// import 'package:tflite/tflite.dart';
 import 'package:qr_users/MLmodule/services/FaceDetectorPainter.dart';
 
 class CameraPicker extends StatefulWidget {
   final CameraDescription camera;
-
+  final String fromScreen;
   const CameraPicker({
+    this.fromScreen,
     Key key,
     @required this.camera,
   }) : super(key: key);
@@ -42,7 +49,9 @@ class TakePictureScreenState extends State<CameraPicker>
   Face faceDetected;
   Size imageSize;
 
-  String predictedUserName = "";
+  FaceNetService _faceNetService = FaceNetService();
+  final DataBaseService _dataBaseService = DataBaseService();
+  double predictedUserName = 0.0;
 
   bool cameraInitializated = false;
   bool isWorking = false;
@@ -55,41 +64,57 @@ class TakePictureScreenState extends State<CameraPicker>
   String confiedence = "";
   String name = "";
   String numbers = "";
-  Future _initializeControllerFuture;
-  // bool isLoading = false;
+  CameraImage currentCameraImage;
   bool intialize = false;
   int numberOfFacesDetected = -1;
-
+  var firstTime = false;
   CameraLensDirection cameraLensDirection = CameraLensDirection.front;
   initCamera() async {
-    cameraController = CameraController(widget.camera, ResolutionPreset.high);
     try {
+      cameraController = CameraController(widget.camera, ResolutionPreset.low);
+
       faceDetector = FirebaseVision.instance.faceDetector(FaceDetectorOptions(
           enableClassification: false,
           minFaceSize: 0.1,
           enableTracking: true,
           mode: FaceDetectorMode.accurate));
+
+      cameraController.initialize().then((value) {
+        if (!mounted) {
+          return;
+        }
+
+        Future.delayed(Duration(milliseconds: 200));
+
+        cameraController.startImageStream((imageFromStream) {
+          if (!isWorking) {
+            isWorking = true;
+
+            //implementar FaceDetection
+
+            performDetectionOnStreamFrame(imageFromStream);
+          }
+        });
+      });
     } catch (e) {
       print(e);
     }
+  }
 
-    cameraController.initialize().then((value) {
-      if (!mounted) {
-        return;
-      }
+  Future signUp(context) async {
+    /// gets predicted data from facenet service (user face detected)
+    List predictedData = _faceNetService.predictedData;
+    String user = Provider.of<UserData>(context, listen: false).user.id;
+    String password = "*";
+    print(
+        "Output from signup : user : $user , predictedData = ${predictedData.length}");
+    // / creates a new user in the 'database'
+    await _dataBaseService
+        .saveData(user, password, predictedData)
+        .whenComplete(() => print("SAved to Database successfully"));
 
-      Future.delayed(Duration(milliseconds: 200));
-
-      cameraController.startImageStream((imageFromStream) {
-        if (!isWorking) {
-          isWorking = true;
-
-          //implementar FaceDetection
-
-          performDetectionOnStreamFrame(imageFromStream);
-        }
-      });
-    });
+    // / resets the face stored in the face net sevice
+    this._faceNetService.setPredictedData(null);
   }
 
   List<Face> scannResult = [];
@@ -99,11 +124,17 @@ class TakePictureScreenState extends State<CameraPicker>
               image: imageFromStream,
               detectInImage: faceDetector.processImage,
               imageRotation: widget.camera.sensorOrientation)
-          .then((dynamic result) {
+          .then((dynamic result) async {
         if (mounted) {
           setState(() {
             scannResult = result;
           });
+          currentCameraImage = imageFromStream;
+          // if (widget.fromScreen == "register") {
+          //   if (_saving) {
+
+          //   }
+          // }
         }
       }).whenComplete(() {
         isWorking = false;
@@ -116,6 +147,7 @@ class TakePictureScreenState extends State<CameraPicker>
   @override
   void initState() {
     super.initState();
+    firstTime = false;
     intialize = false;
     // loadModel();
     // print(imagePath);
@@ -145,26 +177,26 @@ class TakePictureScreenState extends State<CameraPicker>
     );
   }
 
-  applyModelOnImage(File file) async {
-    try {
-      var res = await Tflite.runModelOnImage(
-        path: file.path,
-        numResults: 2,
-        threshold: 0.5,
-        imageMean: 127.5,
-        imageStd: 127.5,
-      );
+  // applyModelOnImage(File file) async {
+  //   try {
+  //     var res = await Tflite.runModelOnImage(
+  //       path: file.path,
+  //       numResults: 2,
+  //       threshold: 0.5,
+  //       imageMean: 127.5,
+  //       imageStd: 127.5,
+  //     );
 
-      _result = res;
-      String str = _result[0]["label"];
-      name = str.substring(2);
-      confiedence = _result != null
-          ? (_result[0]["confidence"] * 100.0).toString().substring(0, 2) + "%"
-          : "";
-    } catch (e) {
-      print(e);
-    }
-  }
+  //     _result = res;
+  //     String str = _result[0]["label"];
+  //     name = str.substring(2);
+  //     confiedence = _result != null
+  //         ? (_result[0]["confidence"] * 100.0).toString().substring(0, 2) + "%"
+  //         : "";
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
 
   File image;
   Future<File> testCompressAndGetFile({File file, String targetPath}) async {
@@ -181,8 +213,10 @@ class TakePictureScreenState extends State<CameraPicker>
   void dispose() {
     // Dispose of the controller when the widget is disposed.
     // _cameraService.cameraController.dispose();
+
     cameraController?.dispose();
-    faceDetector.close();
+    print("******11");
+
     super.dispose();
   }
 
@@ -250,13 +284,24 @@ class TakePictureScreenState extends State<CameraPicker>
                               );
                               // await _controller.takePicture(path);
 
+                              try {
+                                await _faceNetService.setCurrentPrediction(
+                                    currentCameraImage, scannResult[0]);
+                              } catch (e) {
+                                print(e);
+                              }
+
                               await Future.delayed(Duration(milliseconds: 500));
                               await cameraController.stopImageStream();
                               await Future.delayed(Duration(milliseconds: 200));
                               await cameraController.takePicture(path);
 
                               File img = File(path);
-                              await applyModelOnImage(img);
+                              if (widget.fromScreen == "register") {
+                                await signUp(context);
+                              }
+
+                              // await applyModelOnImage(img);
 
                               try {
                                 if (mounted) {
@@ -287,6 +332,10 @@ class TakePictureScreenState extends State<CameraPicker>
                               cameraController.dispose();
                               // _cameraService.cameraController.dispose();
                               print("=====Compressed==========");
+                              if (widget.fromScreen != "register") {
+                                predictedUserName = _faceNetService.predict();
+                                print(predictedUserName);
+                              }
 
                               if (name == "mobiles") {
                                 Fluttertoast.showToast(
@@ -295,7 +344,17 @@ class TakePictureScreenState extends State<CameraPicker>
                                     gravity: ToastGravity.CENTER,
                                     toastLength: Toast.LENGTH_LONG);
                                 Navigator.pop(context);
+                              } else if (predictedUserName >= 1) {
+                                Fluttertoast.showToast(
+                                    msg: "خطا : لم يتم التعرف على الوجة ",
+                                    backgroundColor: Colors.red,
+                                    gravity: ToastGravity.CENTER,
+                                    toastLength: Toast.LENGTH_LONG);
+                                Navigator.pop(context);
                               } else if (numberOfFacesDetected == 1) {
+                                if (widget.fromScreen == "register") {
+                                  Navigator.pop(context, image);
+                                }
                                 Future.delayed(const Duration(seconds: 1), () {
                                   Navigator.push(
                                       context,
@@ -354,11 +413,7 @@ class TakePictureScreenState extends State<CameraPicker>
                   fit: BoxFit.fill,
                   height: double.infinity,
                 ),
-                Positioned(
-                  child: RoundedLoadingIndicator(),
-                  bottom: 100.h,
-                  left: 25.w,
-                ),
+
                 HeaderBeforeLogin(),
 
                 Positioned(
@@ -386,7 +441,7 @@ class TakePictureScreenState extends State<CameraPicker>
                 //       print(faceDetected != null);
                 //       if (faceDetected != null) {
                 //         setState(() {
-                //           predictedUserName = _faceNetService.predict();
+                // predictedUserName = _faceNetService.predict();
                 //         });
                 //       }
                 //     },

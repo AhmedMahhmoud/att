@@ -300,24 +300,6 @@ class ProfileHeader extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Positioned(
-                            right: 5,
-                            bottom: 10.h,
-                            child: GestureDetector(
-                              onTap: onPressed,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color(0xffFF7E00),
-                                ),
-                                height: 35.h,
-                                width: 35.w,
-                                child: Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ))
                       ],
                     ),
                     title != null

@@ -108,7 +108,7 @@ class DrawerI extends StatelessWidget {
                 //   endIndent: 50,
                 // ),
                 ///---------------About Com-------------///
-                Provider.of<UserData>(context, listen: true).user.userType == 0
+                Provider.of<UserData>(context, listen: true).user.userType != 4
                     ? MenuItem(
                         onTap: () {
                           Navigator.pop(context);
@@ -118,7 +118,7 @@ class DrawerI extends StatelessWidget {
                         title: "حسابى",
                         icon: Icons.person)
                     : Container(),
-                Provider.of<UserData>(context, listen: true).user.userType == 0
+                Provider.of<UserData>(context, listen: true).user.userType != 4
                     ? Divider(
                         height: 30.h,
                         thickness: 0.5,

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:cell_info/cell_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -72,9 +71,9 @@ class _HomePageState extends State<HomePage> {
               print(value.speed);
               print(value.speedAccuracy);
             });
-            String platformVersion = await CellInfo.getCellInfo;
+
             print(await Geolocator.isLocationServiceEnabled());
-            print(platformVersion);
+
             // ignore: cancel_subscriptions
             // try {
             //   StreamSubscription<Position> positionStream =
